@@ -1,0 +1,19 @@
+.neon-text {
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary-glow);
+}
+
+.neon-border {
+    border: 1px solid var(--primary);
+    box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.neon-pulse {
+    animation: neon-pulse 2s infinite ease-in-out;
+}
+
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 10px var(--primary-glow); }
+    50% { box-shadow: 0 0 20px var(--primary-glow); }
+    100% { box-shadow: 0 0 10px var(--primary-glow); }
+}

@@ -1,0 +1,9 @@
+[data-theme="dark"] {
+    --bg-main: #0d0d0f;
+    --bg-surface: #121216;
+    --text-main: #e4e4e7;
+
+    --primary: #ff2d95;
+    --primary-glow: rgba(255, 45, 149, 0.55);
+    --border-color: rgba(255, 45, 149, 0.25);
+}

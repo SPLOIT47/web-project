@@ -1,0 +1,45 @@
+import { library } from "@fortawesome/fontawesome-svg-core";
+
+import {
+    faMapMarkerAlt,
+    faUniversity,
+    faUserFriends,
+    faUsers,
+    faGlobe,
+    faBirthdayCake,
+    faInfoCircle,
+    faPlus,
+    faPen,
+    faStar,
+    faUserCheck,
+    faHeart,
+    faComment,
+    faShare,
+    faHome,
+    faEnvelope,
+    faUser,
+    faCog,
+    faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
+
+library.add(
+    faMapMarkerAlt,
+    faUniversity,
+    faUserFriends,
+    faUsers,
+    faGlobe,
+    faBirthdayCake,
+    faInfoCircle,
+    faPlus,
+    faPen,
+    faStar,
+    faUserCheck,
+    faHeart,
+    faComment,
+    faShare,
+    faHome,
+    faEnvelope,
+    faUser,
+    faCog,
+    faSignOutAlt
+);

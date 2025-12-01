@@ -1,0 +1,7 @@
+.header {
+    @apply flex items-center justify-between px-6 py-3 fixed top-0 left-0 right-0;
+    background: rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1000;
+}

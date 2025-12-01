@@ -1,0 +1,83 @@
+.hitech-bg {
+    position: relative;
+    overflow: hidden;
+}
+
+.hitech-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -3;
+    background: var(--bg-main);
+    transition: background 0.3s ease;
+}
+
+.hitech-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-size: 40px 40px;
+    opacity: 0.25;
+
+    background-image:
+            linear-gradient(90deg, rgba(100,150,255,0.15) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(100,150,255,0.15) 1px, transparent 1px);
+
+    animation: grid-move 14s linear infinite;
+}
+
+[data-theme="dark"] .hitech-bg::after {
+    background-image:
+            linear-gradient(90deg, rgba(255,50,150,0.15) 1px, transparent 1px),
+            linear-gradient(0deg, rgba(255,50,150,0.15) 1px, transparent 1px);
+}
+
+.hitech-bg .scanlines {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 2px,
+            rgba(255,255,255,0.1) 3px
+    );
+}
+
+[data-theme="dark"] .hitech-bg .scanlines {
+    background: repeating-linear-gradient(
+            to bottom,
+            transparent 0px,
+            transparent 2px,
+            rgba(255,0,130,0.07) 3px
+    );
+}
+
+.hitech-bg::before {
+    background: linear-gradient(
+            120deg,
+            rgba(255,255,255,0.05),
+            rgba(255,255,255,0) 70%
+    );
+    animation: shimmer 8s infinite linear;
+}
+
+[data-theme="dark"] .hitech-bg::before {
+    background: linear-gradient(
+            120deg,
+            rgba(255,0,180,0.12),
+            rgba(255,0,150,0) 70%
+    );
+}
+
+@keyframes grid-move {
+    from { transform: translateY(0); }
+    to { transform: translateY(-40px); }
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%);}
+    100% { transform: translateX(100%);}
+}

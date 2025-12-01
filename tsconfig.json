@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "types": ["vite/client", "react", "react-dom"],
+    /* === Основные === */
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "bundler",
+
+    /* === React & JSX === */
+    "jsx": "react-jsx",
+    "allowJs": false,
+
+    /* === Совместимость === */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    /* === Безопасность === */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+
+    /* === Пути / Алиасы === */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"],
+      "@context/*": ["src/context/*"],
+      "@i18n/*": ["src/i18n/*"],
+      "@styles/*": ["src/styles/*"],
+      "@layouts/*": ["src/layouts/*"]
+    }
+  },
+
+  /* === Какие файлы включать === */
+  "include": ["src"],
+
+  /* === Исключения === */
+  "exclude": ["node_modules", "dist"]
+}

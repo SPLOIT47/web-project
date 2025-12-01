@@ -1,0 +1,9 @@
+{
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in",
+    "register": "Create account"
+  }
+}
