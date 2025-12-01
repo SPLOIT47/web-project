@@ -14,5 +14,6 @@ export default defineConfig({
             "@styles": path.resolve(__dirname, "src/styles"),
             "@layouts": path.resolve(__dirname, "src/layouts"),
         }
-    }
+    },
+    base: "/web-project",
 });

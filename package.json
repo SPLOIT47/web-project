@@ -1,4 +1,6 @@
 {
+  "name": "web-project",
+  "homepage": "https://SPLOIT47.github.io/web-project/",
   "main": "vite.config.js",
   "scripts": {
     "dev": "vite",
