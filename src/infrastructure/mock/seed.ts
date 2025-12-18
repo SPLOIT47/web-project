@@ -21,7 +21,7 @@ export function seedMockDatabase() {
             name: "alex",
             surname: "degtyar",
             email: "alex@example.com",
-            bio: "Backend enjoyer ☕ Java & systems",
+            bio: "alex desc",
             avatarUrl: "",
 
             birthday: "1998-03-05",
@@ -48,7 +48,7 @@ export function seedMockDatabase() {
             name: "kate",
             surname: "Miller",
             email: "kate@example.com",
-            bio: "UI / UX • Neon lover ✨",
+            bio: "kate desc",
             avatarUrl: "",
 
             city: "Berlin",
@@ -73,7 +73,7 @@ export function seedMockDatabase() {
             name: "john",
             surname: "Doe",
             email: "john@example.com",
-            bio: "Just a test user",
+            bio: "john desc",
             avatarUrl: "",
 
             friends: [],
