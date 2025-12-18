@@ -1,31 +1,38 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import { useChatStore } from "@/store/chatStore";
 import ChatMessage from "./ChatMessage";
-import TypingIndicator from "./TypingIndicator";
+import {ServiceLocator} from "@/application/ServiceLocator";
 
-export default function ChatWindow({ activeChat }: { activeChat: string }) {
-    const [messages, setMessages] = useState([
-        { from: "other", text: "Hey there! 👋", time: "11:24", status: "read" },
-        { from: "me", text: "Hello!", time: "11:25", status: "delivered" },
-        { from: "other", text: "How's your day?", time: "11:26", status: "read" },
-        { from: "me", text: "Pretty good!", time: "11:27", status: "sent" },
-    ]);
+export default function ChatWindow() {
+    const activeChatId = useChatStore(s => s.activeChatId);
+    const messagesMap = useChatStore(s => s.messages);
+    const refreshMessages = useChatStore(s => s.refreshMessages);
+
+    const messages = messagesMap[activeChatId!] ?? [];
 
     const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+    }, [messages.length]);
+
+
+    useEffect(() => {
+        if (!activeChatId) return;
+
+        const interval = setInterval(() => {
+            refreshMessages(activeChatId);
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [activeChatId, refreshMessages]);
 
     return (
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
-
-            {messages.map((m, index) => (
-                <ChatMessage key={index} msg={m} />
+            {messages.map(m => (
+                <ChatMessage key={m.id} msg={m} />
             ))}
-
-            <TypingIndicator name={activeChat} />
-
-            <div ref={bottomRef}></div>
+            <div ref={bottomRef} />
         </div>
     );
 }

@@ -1,68 +1,139 @@
-import type { CommunityService } from "@/domain/community/CommunityService";
+import type { CommunityService } from "@/application/community/CommunityService";
 import type { Community } from "@/domain/community/Community";
 import type { Post } from "@/domain/post/Post";
-import { db } from "./database";
+import type { CreateCommunityPayload } from "@/domain/community/CreateCommunityPayload";
+
 import { faker } from "@faker-js/faker";
+import { loadDb, saveDb } from "./database";
 import { mockResponse } from "./mockApi";
 
 export class MockCommunityService implements CommunityService {
+
     async getById(id: string): Promise<Community | null> {
-        return mockResponse(db.communities.find(c => c.id === id) || null);
+        const db = loadDb();
+
+        return mockResponse(
+            db.communities.find(c => c.id === id) ?? null
+        );
     }
 
     async getAll(): Promise<Community[]> {
+        const db = loadDb();
         return mockResponse(db.communities);
     }
 
-    async getPosts(id: string): Promise<Post[]> {
-        const c = db.communities.find(c => c.id === id);
-        if (!c) return mockResponse([]);
-        return mockResponse(db.posts.filter(p => c.posts.includes(p.id)));
+    async getPosts(communityId: string): Promise<Post[]> {
+        const db = loadDb();
+
+        const community = db.communities.find(
+            c => c.id === communityId
+        );
+
+        if (!community) return mockResponse([]);
+
+        return mockResponse(
+            db.posts.filter(p =>
+                community.posts.includes(p.id)
+            )
+        );
     }
 
-    async create(data: Partial<Community>): Promise<Community> {
-        const c: Community = {
+    async create(
+        data: CreateCommunityPayload,
+        creatorId: string
+    ): Promise<Community> {
+        const db = loadDb();
+
+        const community: Community = {
             id: faker.string.uuid(),
-            name: data.name ?? "New Community",
-            avatarUrl: data.avatarUrl ?? faker.image.avatar(),
-            coverUrl: data.coverUrl ?? faker.image.urlPicsumPhotos(),
+
+            name: data.name,
+            type: data.type,
+            category: data.category,
             description: data.description ?? "",
-            category: data.category ?? "Other",
-            type: data.type ?? "public",
 
-            followers: [],
-            admins: data.admins ?? [],
+            avatarUrl: data.avatarUrl ?? "",
+            coverUrl: data.coverUrl ?? "",
+
+            followers: [creatorId],
+            admins: [creatorId],
             moderators: [],
-
             posts: [],
 
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
 
-        db.communities.push(c);
-        return mockResponse(c);
+        db.communities.push(community);
+        saveDb(db);
+
+        return mockResponse(community);
     }
 
-    async follow(communityId: string, userId: string): Promise<void> {
-        const c = db.communities.find(c => c.id === communityId);
-        if (c && !c.followers.includes(userId)) c.followers.push(userId);
+    async follow(
+        communityId: string,
+        userId: string
+    ): Promise<void> {
+        const db = loadDb();
+
+        const c = db.communities.find(
+            c => c.id === communityId
+        );
+        if (!c) return mockResponse(undefined);
+
+        if (!c.followers.includes(userId)) {
+            c.followers.push(userId);
+            saveDb(db);
+        }
+
         return mockResponse(undefined);
     }
 
-    async unfollow(communityId: string, userId: string): Promise<void> {
-        const c = db.communities.find(c => c.id === communityId);
-        if (c) c.followers = c.followers.filter(id => id !== userId);
+    async unfollow(
+        communityId: string,
+        userId: string
+    ): Promise<void> {
+        const db = loadDb();
+
+        const c = db.communities.find(
+            c => c.id === communityId
+        );
+        if (!c) return mockResponse(undefined);
+
+        c.followers = c.followers.filter(
+            (id: string) => id !== userId
+        );
+
+        saveDb(db);
         return mockResponse(undefined);
     }
 
-    async update(communityId: string, data: Partial<Community>): Promise<Community | null> {
-        const c = db.communities.find(c => c.id === communityId);
+    async update(
+        communityId: string,
+        data: Partial<Omit<Community, "id" | "createdAt">>
+    ): Promise<Community | null> {
+        const db = loadDb();
+
+        const c = db.communities.find(
+            c => c.id === communityId
+        );
         if (!c) return mockResponse(null);
 
         Object.assign(c, data);
         c.updatedAt = new Date().toISOString();
 
+        saveDb(db);
         return mockResponse(c);
+    }
+
+    async delete(id: string): Promise<void> {
+        const db = loadDb();
+
+        db.communities = db.communities.filter(
+            c => c.id !== id
+        );
+
+        saveDb(db);
+        return mockResponse(undefined);
     }
 }

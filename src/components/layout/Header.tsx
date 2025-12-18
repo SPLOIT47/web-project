@@ -1,41 +1,38 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Icon from "@components/ui/Icon";
+import {useAuthStore} from "@/store";
 
 export default function Header() {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const logout = useAuthStore(s => s.logout);
+
+    const go = (path: string) => {
+        setMenuOpen(false);
+        navigate(path);
+    };
 
     return (
         <header
             className="
                 fixed top-0 left-0 right-0 z-50
-                h-16 flex items-center justify-between
-                px-6
+                h-14 tablet:h-16
+                flex items-center justify-between
+                px-3 mobile:px-4 tablet:px-6
                 bg-[var(--bg-surface)]
                 border-b border-[var(--border-color)]
                 shadow-[0_0_12px_var(--primary-glow)]
             "
         >
             <div
-                className="text-xl font-bold neon-text cursor-pointer"
+                className="text-lg mobile:text-xl font-bold neon-text cursor-pointer"
                 onClick={() => navigate("/home")}
             >
-                SocialNetwork
+                {t("app.name")}
             </div>
-
-            <input
-                type="text"
-                placeholder="Search..."
-                className="
-                    bg-[var(--bg-main)]
-                    border border-[var(--border-color)]
-                    px-4 py-1.5 rounded-lg
-                    focus:ring-2 focus:ring-[var(--primary)]
-                    shadow-sm transition-all hidden sm:block
-                    w-1/2
-                "
-            />
 
             <button
                 onClick={() => setMenuOpen(!menuOpen)}
@@ -59,32 +56,47 @@ export default function Header() {
             {menuOpen && (
                 <div
                     className="
-            absolute right-6 top-[70px] w-44
+            absolute right-3 mobile:right-4 tablet:right-6 
+            top-[58px] tablet:top-[70px] 
+            w-40 mobile:w-44
             neon-surface p-3 rounded-xl
             flex flex-col gap-2
-            animate-fade-in
+            animate-fade-in z-50
         "
                 >
-                    <button onClick={() => navigate("/home")} className="flex items-center gap-2 neon-text-hover text-left">
-                        <Icon name="home" /> Home
+                    <button onClick={() => go("/home")} className="flex items-center gap-2 neon-text-hover text-left">
+                        <Icon name="home" /> {t("header.home")}
                     </button>
 
-                    <button onClick={() => navigate("/messages")} className="flex items-center gap-2 neon-text-hover text-left">
-                        <Icon name="envelope" /> Messages
+                    <button onClick={() => go("/messages")} className="flex items-center gap-2 neon-text-hover text-left">
+                        <Icon name="envelope" /> {t("header.messages")}
                     </button>
 
-                    <button onClick={() => navigate("/profile")} className="flex items-center gap-2 neon-text-hover text-left">
-                        <Icon name="user" /> Profile
+                    <button
+                        onClick={() => go("/communities")}
+                        className="flex items-center gap-2 neon-text-hover text-left"
+                    >
+                        <Icon name="users" /> {t("header.communities")}
                     </button>
 
-                    <button onClick={() => navigate("/settings")} className="flex items-center gap-2 neon-text-hover text-left">
-                        <Icon name="cog" /> Settings
+                    <button onClick={() => go("/profile")} className="flex items-center gap-2 neon-text-hover text-left">
+                        <Icon name="user" /> {t("header.profile")}
+                    </button>
+
+                    <button onClick={() => go("/settings")} className="flex items-center gap-2 neon-text-hover text-left">
+                        <Icon name="cog" /> {t("header.settings")}
                     </button>
 
                     <div className="h-px bg-[var(--border-color)]"></div>
 
-                    <button className="flex items-center gap-2 text-red-400 hover:text-red-300 text-left">
-                        <Icon name="sign-out-alt" /> Logout
+                    <button
+                        className="flex items-center gap-2 text-red-400 hover:text-red-300 text-left"
+                        onClick={() => {
+                            logout();
+                            navigate("/");
+                        }}
+                    >
+                        <Icon name="sign-out-alt" /> {t("header.logout")}
                     </button>
                 </div>
             )}

@@ -1,69 +1,132 @@
-import type { ChatService } from "@/domain/chat/ChatService";
+import type { ChatService } from "@/application/chat/ChatService";
 import type { Chat } from "@/domain/chat/Chat";
-import type { Message, MessageStatus } from "@/domain/chat/Message";
-import { db } from "./database";
-import { faker } from "@faker-js/faker";
+import type { CreateChatPayload } from "@/domain/chat/CreateChatPayload";
+import type { SendMessagePayload } from "@/domain/chat/SendMessagePayload";
+
 import { mockResponse } from "./mockApi";
+import { loadDb, saveDb } from "@/infrastructure/mock/database";
 
 export class MockChatService implements ChatService {
-    async getById(id: string): Promise<Chat | null> {
-        return mockResponse(db.chats.find(c => c.id === id) || null);
-    }
+    async getMyChats(userId: string): Promise<Chat[]> {
+        const db = loadDb();
 
-    async getByUser(userId: string): Promise<Chat[]> {
-        return mockResponse(db.chats.filter(c => c.participants.includes(userId)));
-    }
-
-    async create(userA: string, userB: string): Promise<Chat> {
-        const existing = db.chats.find(
-            c => c.participants.includes(userA) && c.participants.includes(userB)
+        return mockResponse(
+            db.chats.filter(
+                c =>
+                    (c.type !== "community" &&
+                        c.members.includes(userId)) ||
+                    (c.type === "community" && c.userId === userId)
+            )
         );
-        if (existing) return mockResponse(existing);
+    }
 
-        const chat: Chat = {
-            id: faker.string.uuid(),
-            participants: [userA, userB],
-            messages: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
+    async getCommunityChats(communityId: string): Promise<Chat[]> {
+        const db = loadDb();
 
-        db.chats.push(chat);
+        return mockResponse(
+            db.chats.filter(
+                c =>
+                    c.type === "community" &&
+                    c.communityId === communityId &&
+                    !!c.userId
+            )
+        );
+    }
+
+    async getOrCreateCommunityChat(
+        communityId: string,
+        userId: string
+    ): Promise<Chat> {
+        const db = loadDb();
+
+        let chat = db.chats.find(
+            c =>
+                c.type === "community" &&
+                c.communityId === communityId &&
+                c.userId === userId
+        );
+
+        if (!chat) {
+            chat = {
+                id: crypto.randomUUID(),
+                type: "community",
+                communityId,
+                userId,
+                members: [],
+                lastMessage: null,
+                createdAt: new Date().toISOString(),
+            };
+
+            db.chats.unshift(chat);
+            saveDb(db);
+        }
+
         return mockResponse(chat);
     }
 
-    async getMessages(chatId: string): Promise<Message[]> {
-        return mockResponse(db.messages.filter(m => m.chatId === chatId));
-    }
+    async createChat(payload: CreateChatPayload): Promise<Chat> {
+        const db = loadDb();
 
-    async sendMessage(chatId: string, senderId: string, text: string): Promise<Message> {
-        const msg: Message = {
-            id: faker.string.uuid(),
-            chatId,
-            senderId,
-            text,
-            status: "sent",
+        const chat: Chat = {
+            id: crypto.randomUUID(),
+            type: payload.type,
+            members: payload.members,
+            title:
+                payload.type === "group"
+                    ? payload.title
+                    : undefined,
+            lastMessage: null,
             createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
         };
 
-        db.messages.push(msg);
+        db.chats.unshift(chat);
+        saveDb(db);
+
+        return mockResponse(chat);
+    }
+
+    async deleteChat(chatId: string): Promise<void> {
+        const db = loadDb();
+
+        db.chats = db.chats.filter(c => c.id !== chatId);
+        db.messages = db.messages.filter(m => m.chatId !== chatId);
+
+        saveDb(db);
+        return mockResponse(undefined);
+    }
+
+    async getMessages(chatId: string): Promise<Message[]> {
+        const db = loadDb();
+
+        return mockResponse(
+            db.messages.filter(m => m.chatId === chatId)
+        );
+    }
+
+    async sendMessage(
+        chatId: string,
+        author: Message["author"],
+        payload: SendMessagePayload
+    ): Promise<Message> {
+        const db = loadDb();
+
+        const message: Message = {
+            id: crypto.randomUUID(),
+            chatId,
+            author,
+            text: payload.text,
+            createdAt: new Date().toISOString(),
+            status: "sent",
+        };
+
+        db.messages.push(message);
 
         const chat = db.chats.find(c => c.id === chatId);
         if (chat) {
-            chat.messages.push(msg.id);
-            chat.updatedAt = new Date().toISOString();
+            chat.lastMessage = message;
         }
 
-        return mockResponse(msg);
-    }
-
-    async updateMessageStatus(messageId: string, status: MessageStatus): Promise<void> {
-        const msg = db.messages.find(m => m.id === messageId);
-        if (msg) {
-            msg.status = status;
-            msg.updatedAt = new Date().toISOString();
-        }
-        return mockResponse(undefined);
+        saveDb(db);
+        return mockResponse(message);
     }
 }

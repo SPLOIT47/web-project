@@ -1,9 +1,341 @@
 {
+  "app": {
+    "name": "СоцСеть"
+  },
   "auth": {
     "login": "Вход",
     "email": "Эл. почта",
     "password": "Пароль",
+    "username": "Имя пользователя",
+    "name": "Имя",
+    "surname": "Фамилия",
     "submit": "Войти",
-    "register": "Создать аккаунт"
+    "register": "Создать аккаунт",
+    "welcomeBack": "С возвращением!",
+    "welcomeBackDesc": "Чтобы оставаться на связи, войдите с помощью своих данных",
+    "helloFriend": "Привет, друг!",
+    "helloFriendDesc": "Введите свои данные и начните путешествие с нами"
+  },
+  "header": {
+    "search": "Поиск...",
+    "home": "Главная",
+    "messages": "Сообщения",
+    "profile": "Профиль",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "communities": "Сообщества"
+  },
+  "sidebar": {
+    "myProfile": "Мой профиль",
+    "messages": "Сообщения",
+    "friends": "Друзья",
+    "communities": "Сообщества",
+    "settings": "Настройки"
+  },
+  "post": {
+    "placeholder": "О чем вы думаете?",
+    "button": "Опубликовать",
+    "commentPlaceholder": "Написать комментарий...",
+    "send": "Отправить",
+    "likes": "{{count}} лайков",
+    "comments": "{{count}} комментариев",
+    "addPhoto": "Добавить фото",
+    "publishedBy": "Публикатор"
+  },
+  "profile": {
+    "loadingProfile": "Загрузка профиля...",
+    "notAuthenticated": "Не авторизован",
+    "livesIn": "Живёт в",
+    "studiesAt": "Учится в",
+    "hideDetails": "Скрыть детали",
+    "moreDetails": "Больше деталей",
+    "posts": "Посты",
+    "followers": "Подписчики",
+    "following": "Подписки",
+    "editProfile": "Редактировать профиль",
+    "addPost": "Добавить пост",
+    "about": "О себе",
+    "noDescription": "Описание отсутствует",
+    "loadingPosts": "Загрузка постов...",
+    "noPosts": "Пока нет постов",
+    "profileDetails": "Детали профиля",
+    "birthDate": "Дата рождения",
+    "city": "Город",
+    "education": "Образование",
+    "friends": "Друзья",
+    "languages": "Языки",
+    "message": "Сообщения"
+  },
+  "settings": {
+    "title": "Настройки",
+    "profileSettings": "Настройки профиля",
+    "yourName": "Ваше имя",
+    "username": "Имя пользователя",
+    "email": "Эл. почта",
+    "saveChanges": "Сохранить изменения",
+    "security": "Безопасность",
+    "currentPassword": "Текущий пароль",
+    "newPassword": "Новый пароль",
+    "repeatNewPassword": "Повторите новый пароль",
+    "changePassword": "Изменить пароль",
+    "appearance": "Внешний вид",
+    "theme": "Тема",
+    "toggleTheme": "Переключить тему ({{theme}})",
+    "language": "Язык",
+    "english": "English",
+    "russian": "Русский",
+    "account": "Аккаунт",
+    "logout": "Выйти",
+    "deleteAccount": "Удалить аккаунт",
+    "confirmDelete": "Вы уверены, что хотите удалить свою учетную запись?"
+  },
+  "friends": {
+    "title": "Друзья",
+    "tabs": {
+      "friends": "Друзья",
+      "requests": "Запросы",
+      "outgoing": "Исходящие",
+      "search": "Поиск"
+    },
+    "noFriends": "Пока нет друзей",
+    "noRequests": "Нет запросов в друзья",
+    "noOutgoing": "Нет исходящих запросов",
+    "searchPlaceholder": "Поиск друзей...",
+    "searchPeople": "Поиск людей...",
+    "searching": "Поиск...",
+    "addFriend": "Добавить в друзья",
+    "acceptRequest": "Принять",
+    "rejectRequest": "Отклонить",
+    "decline": "Отклонить",
+    "cancelRequest": "Отменить",
+    "cancel": "Отменить",
+    "removeFriend": "Удалить из друзей",
+    "remove": "Удалить",
+    "message": "Сообщение"
+  },
+  "communities": {
+    "title": "Сообщества",
+    "createCommunity": "Создать сообщество",
+    "tabs": {
+      "all": "Все",
+      "my": "Мои сообщества",
+      "manage": "Управление",
+      "search": "Поиск"
+    },
+    "members": "участников",
+    "noCommunities": "Сообщества не найдены",
+    "noCommunitiesHere": "Здесь нет сообществ",
+    "join": "Вступить",
+    "leave": "Покинуть",
+    "manage": "Управление"
+  },
+  "createCommunity": {
+    "title": "Создать сообщество",
+    "name": "Название сообщества",
+    "type": "Тип",
+    "typePublic": "Публичная страница",
+    "typeGroup": "Группа",
+    "typeEvent": "Событие",
+    "category": "Категория",
+    "categoryTechnology": "Технологии",
+    "categoryDesign": "Дизайн",
+    "categoryEducation": "Образование",
+    "categoryScience": "Наука",
+    "categoryEntertainment": "Развлечения",
+    "categorySports": "Спорт",
+    "description": "Описание",
+    "descriptionPlaceholder": "Напишите что-нибудь о вашем сообществе...",
+    "avatar": "Аватар",
+    "cover": "Обложка",
+    "creating": "Создание...",
+    "create": "Создать сообщество"
+  },
+  "chat": {
+    "select": "Выберите чат",
+    "userFallback": "Пользователь",
+    "communityFallback": "Сообщество",
+    "groupFallback": "Групповой чат",
+    "online": "в сети",
+    "members": "{{count}} участников",
+    "communitySubtitle": "Чат сообщества",
+    "title": "Чаты",
+    "new": "Новый",
+    "placeholder": "Введите сообщение...",
+    "send": "Отправить",
+    "typingOne": "Кто-то печатает…",
+    "typingMany": "Несколько человек печатают…"
+  },
+  "modal": {
+    "close": "Закрыть",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "confirm": "Подтвердить",
+    "editProfile": {
+      "title": "Редактировать профиль",
+      "displayName": "Отображаемое имя",
+      "name": "Имя",
+      "surname": "Фамилия",
+      "bio": "О себе",
+      "city": "Город",
+      "education": "Образование",
+      "website": "Веб-сайт",
+      "save": "Сохранить изменения",
+      "upload": "Загрузить",
+      "remove": "Удалить",
+      "saving": "Сохранение..."
+    },
+    "addPost": {
+      "title": "Создать пост",
+      "placeholder": "О чем вы думаете?",
+      "create": "Создать пост"
+    },
+    "createChat": {
+      "title": "Создать чат",
+      "selectUsers": "Выберите пользователей...",
+      "create": "Создать чат",
+      "private": "Личный",
+      "group": "Групповой",
+      "groupName": "Название группы",
+      "searchUsers": "Поиск пользователей"
+    },
+    "chatInfo": {
+      "title": "Информация о чате",
+      "members": "Участники",
+      "leave": "Покинуть чат",
+      "addMember": "Добавить участника...",
+      "remove": "Удалить",
+      "leaveChat": "Покинуть чат",
+      "deleteChat": "Удалить чат"
+    },
+    "communityDetails": {
+      "title": "Детали сообщества",
+      "description": "Описание",
+      "category": "Категория",
+      "type": "Тип",
+      "created": "Создано",
+      "members": "Участники"
+    },
+    "communityFollowers": {
+      "title": "Подписчики сообщества",
+      "noFollowers": "Пока нет подписчиков"
+    },
+    "confirmDelete": {
+      "title": "Подтвердить удаление",
+      "message": "Вы уверены, что хотите удалить это сообщество? Это действие нельзя отменить.",
+      "delete": "Удалить",
+      "cancel": "Отмена"
+    }
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успешно",
+    "noResults": "Результатов не найдено",
+    "search": "Поиск",
+    "filter": "Фильтр",
+    "sort": "Сортировка",
+    "cancel": "Отмена",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "update": "Обновить",
+    "submit": "Отправить",
+    "back": "Назад",
+    "next": "Следующий",
+    "previous": "Предыдущий",
+    "close": "Закрыть",
+    "yes": "Да",
+    "no": "Нет"
+  },
+  "communityPage": {
+    "loadingCommunity": "Загрузка сообщества...",
+    "aboutCommunity": "О сообществе",
+    "noDescription": "Описание отсутствует",
+    "requestToJoin": "Запросить вступление",
+    "joinCommunity": "Вступить в сообщество",
+    "writeToCommunity": "Написать сообществу",
+    "leaveCommunity": "Покинуть сообщество",
+    "editCommunity": "Редактировать сообщество",
+    "communityChats": "Чаты сообщества",
+    "deleteCommunity": "Удалить сообщество",
+    "noPosts": "Пока нет постов"
+  },
+  "communitySettings": {
+    "title": "Настройки сообщества",
+    "tabs": {
+      "general": "Основные",
+      "details": "Детали",
+      "appearance": "Внешний вид",
+      "members": "Участники",
+      "permissions": "Права доступа",
+      "delete": "Удалить"
+    },
+    "general": {
+      "communityName": "Название сообщества",
+      "category": "Категория",
+      "description": "Описание",
+      "save": "Сохранить"
+    },
+    "details": {
+      "title": "Детали сообщества",
+      "shortDescription": "Краткое описание",
+      "fullDescription": "Полное описание",
+      "tags": "Теги (через запятую)",
+      "status": "Статус",
+      "open": "Открыто",
+      "closed": "Закрыто",
+      "opensAt": "Открывается в",
+      "address": "Адрес",
+      "city": "Город",
+      "street": "Улица",
+      "building": "Здание",
+      "contacts": "Контакты",
+      "email": "Эл. почта",
+      "phone": "Телефон",
+      "telegram": "Telegram",
+      "vk": "ВКонтакте",
+      "website": "Веб-сайт",
+      "saveDetails": "Сохранить детали",
+      "cancel": "Отмена"
+    },
+    "appearance": {
+      "avatar": "Аватар",
+      "cover": "Обложка",
+      "uploadAvatar": "Загрузить аватар",
+      "uploadCover": "Загрузить обложку"
+    },
+    "members": {
+      "title": "Участники",
+      "admins": "Администраторы",
+      "followers": "Подписчики",
+      "roles": {
+        "admin": "Администратор",
+        "moderator": "Модератор",
+        "editor": "Редактор",
+        "member": "Участник"
+      }
+    },
+    "delete": {
+      "title": "Удалить сообщество",
+      "warning": "Это действие нельзя отменить",
+      "confirm": "Удалить сообщество"
+    }
+  },
+  "communityRightbar": {
+    "about": "О сообществе",
+    "followers": "подписчиков",
+    "publicCommunity": "Публичное сообщество",
+    "closedCommunity": "Закрытое сообщество",
+    "showDetails": "Показать детали",
+    "friendsInCommunity": "Друзья в сообществе",
+    "friends": "{{count}} друзей",
+    "contacts": "Контакты",
+    "showAllFollowers": "Показать всех подписчиков"
+  },
+  "fileUpload": {
+    "uploadImage": "Загрузить изображение",
+    "chooseFile": "Выбрать файл"
   }
 }

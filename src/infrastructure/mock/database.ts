@@ -1,13 +1,37 @@
-import type { User } from "@/domain/user/User";
-import type { Community } from "@/domain/community/Community";
-import type { Post } from "@/domain/post/Post";
-import type { Chat } from "@/domain/chat/Chat";
-import type { Message } from "@/domain/chat/Message";
+const STORAGE_KEY = "__mock_db__";
 
-export const db = {
-    users: [] as User[],
-    communities: [] as Community[],
-    posts: [] as Post[],
-    chats: [] as Chat[],
-    messages: [] as Message[],
+export type MockDB = {
+    users: any[];
+    communities: any[];
+    chats: any[];
+    messages: any[];
+    posts: any[];
+    communityDetails: any[];
 };
+
+const defaultDb: MockDB = {
+    users: [],
+    communities: [],
+    chats: [],
+    messages: [],
+    posts: [],
+    communityDetails: [],
+};
+
+export function loadDb(): MockDB {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultDb));
+        return structuredClone(defaultDb);
+    }
+
+    return JSON.parse(raw);
+}
+
+export function saveDb(db: MockDB) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+export function resetDb() {
+    localStorage.removeItem(STORAGE_KEY);
+}

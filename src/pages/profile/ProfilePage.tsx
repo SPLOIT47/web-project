@@ -1,106 +1,281 @@
-import { useState } from "react";
-import { useAuthStore } from "@/store";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams, useNavigate } from "react-router-dom";
+
+import { useAuthStore } from "@/store/authStore";
+import { useProfileStore } from "@/store/profileStore";
+import { usePostStore } from "@/store/postStore";
+import { useFriendsStore } from "@/store/friendsStore";
+import { useChatStore } from "@/store/chatStore";
+import { useModalStore } from "@/store/modalStore";
+
 import Card from "@components/ui/Card";
-import Avatar from "@components/ui/Avatar";
 import Button from "@components/ui/Button";
 import Icon from "@components/ui/Icon";
+import AvatarUploader from "@components/ui/AvatarUploader";
 import Post from "@components/feed/Post";
-import ProfileDetails from "@pages/profile/ProfileDetails";
-import EditProfileModal from "@pages/profile/EditProfileModal";
+import PostEditor from "@components/post/PostEditor";
+
+import ProfileDetails from "./ProfileDetails";
+import { getUserDisplayName } from "@/presentation/user/userDisplayName";
+import type { PostAuthor } from "@/domain/post/PostAuthor";
 
 export default function ProfilePage() {
+    const { t } = useTranslation();
+    const navigate = useNavigate();
+    const { id } = useParams<{ id?: string }>();
+
+    const authUser = useAuthStore(s => s.user);
+    const isMe = !id || id === authUser?.id;
+    const targetUserId = isMe ? authUser?.id : id;
+
     const [showDetails, setShowDetails] = useState(false);
-    const [editOpen, setEditOpen] = useState(false);
+    const [showPostEditor, setShowPostEditor] = useState(false);
 
-    const user = useAuthStore((s) => s.user);
-    const loading = useAuthStore((s) => s.loading);
+    const {
+        user,
+        loading: profileLoading,
+        loadProfile,
+        updateProfile,
+    } = useProfileStore();
 
-    if (loading) {
-        return <div className="p-6 text-center opacity-60">Loading profile...</div>;
+    const {
+        allPosts,
+        loading: postsLoading,
+    } = usePostStore();
+
+    const {
+        getRelation,
+        sendRequest,
+        accept,
+        decline,
+        cancel,
+        remove,
+    } = useFriendsStore();
+
+    const { openEditProfile } = useModalStore();
+
+    const openOrCreatePrivateChat =
+        useChatStore(s => s.openOrCreatePrivateChat);
+
+    const posts = allPosts.filter(
+        p =>
+            p.author.type === "user" &&
+            p.author.userId === user?.id
+    );
+
+    useEffect(() => {
+        if (!authUser) return;
+
+        const targetId = isMe ? authUser.id : id!;
+        loadProfile(targetId);
+    }, [id, authUser, isMe, loadProfile]);
+
+    if (profileLoading) {
+        return (
+            <div className="p-6 text-center opacity-60">
+                {t("profile.loadingProfile")}
+            </div>
+        );
     }
 
-    if (!user) {
-        return <div className="p-6 text-center opacity-60">Not authenticated</div>;
+    if (!user || !authUser) {
+        return (
+            <div className="p-6 text-center opacity-60">
+                {t("profile.notFound")}
+            </div>
+        );
     }
+
+    const relation = getRelation(user.id);
+
+
+    const handleMessage = async () => {
+        await openOrCreatePrivateChat(user.id);
+        navigate("/messages");
+    };
+
+    const postAuthor: PostAuthor = {
+        type: "user",
+        userId: authUser.id,
+    };
 
     return (
-        <div className="h-[calc(100vh-80px)] overflow-y-auto p-4 text-[var(--text-main)] fade-in">
-            <div className="max-w-4xl mx-auto">
+        <div className="h-[calc(100vh-80px)] overflow-y-auto p-4 fade-in">
+            <div className="max-w-6xl mx-auto">
 
                 <div className="flex gap-6 items-center">
-                    <Avatar src={user.avatarUrl} size={110} />
+
+                    <AvatarUploader
+                        value={user.avatarUrl}
+                        size={110}
+                        disabled={!isMe}
+                        onChange={async url => {
+                            if (isMe) {
+                                await updateProfile({ avatarUrl: url ?? "" });
+                            }
+                        }}
+                    />
 
                     <div className="flex flex-col gap-2">
+                        <h1 className="text-3xl font-bold neon-text">
+                            {getUserDisplayName(user)}
+                        </h1>
 
-                        <h1 className="text-3xl font-bold neon-text">{user.name}</h1>
                         <div className="opacity-70">@{user.username}</div>
 
                         <div className="text-sm opacity-80 flex flex-col gap-1">
-
                             {user.city && (
                                 <div className="flex gap-2 items-center">
-                                    <Icon name="map-marker-alt" className="text-[var(--primary)]" />
-                                    Lives in <b className="neon-text">{user.city}</b>
+                                    <Icon name="map-marker-alt" />
+                                    {t("profile.livesIn")} <b>{user.city}</b>
                                 </div>
                             )}
 
                             {user.education && (
                                 <div className="flex gap-2 items-center">
-                                    <Icon name="university" className="text-[var(--primary)]" />
-                                    Studies at <b className="neon-text">{user.education}</b>
+                                    <Icon name="university" />
+                                    {t("profile.studiesAt")} <b>{user.education}</b>
                                 </div>
                             )}
 
                             <button
                                 onClick={() => setShowDetails(v => !v)}
-                                className="mt-1 text-[var(--primary)] hover:underline text-sm flex items-center gap-1"
+                                className="text-[var(--primary)] hover:underline flex gap-1 items-center"
                             >
                                 <Icon name="info-circle" />
-                                {showDetails ? "Hide details" : "More details"}
+                                {showDetails
+                                    ? t("profile.hideDetails")
+                                    : t("profile.moreDetails")}
                             </button>
-
                         </div>
 
                         <div className="flex gap-6 mt-2">
-                            <div><span className="font-bold neon-text">{user.posts.length ?? 0}</span> Posts</div>
-                            <div><span className="font-bold neon-text">{user.followers.length ?? 0}</span> Followers</div>
-                            <div><span className="font-bold neon-text">{user.following?.length ?? 0}</span> Following</div>
+                            <div>
+                                <b>{posts.length}</b> {t("profile.posts")}
+                            </div>
+                            <div>
+                                <b>{user.friends.length}</b> {t("profile.friends")}
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {showDetails && <ProfileDetails user={user} />}
 
-                <div className="mt-6 flex gap-4 fade-in">
+                <div className="mt-6 flex gap-4 flex-wrap">
 
-                    <Button
-                        className="px-6 py-3 text-lg font-semibold flex items-center gap-2"
-                        onClick={() => setEditOpen(true)}
-                    >
-                        <Icon name="user-edit" /> Edit Profile
-                    </Button>
+                    {isMe && (
+                        <>
+                            <Button onClick={() => openEditProfile(user)}>
+                                {t("profile.editProfile")}
+                            </Button>
 
-                    <Button className="px-6 py-3 text-lg font-semibold flex items-center gap-2 neon-pulse">
-                        <span className="text-xl">✦</span> Add Post
-                    </Button>
+                            <Button
+                                className="neon-pulse"
+                                onClick={() => setShowPostEditor(v => !v)}
+                            >
+                                {t("profile.addPost")}
+                            </Button>
+                        </>
+                    )}
 
+                    {!isMe && (
+                        <>
+                            <Button
+                                onClick={handleMessage}
+                                className="neon-pulse"
+                            >
+                                <Icon name="envelope" />
+                                {t("profile.message")}
+                            </Button>
+
+                            {relation === "friends" && (
+                                <Button
+                                    className="bg-red-600"
+                                    onClick={() =>
+                                        remove(authUser.id, user.id)
+                                    }
+                                >
+                                    {t("friends.removeFriend")}
+                                </Button>
+                            )}
+
+                            {relation === "incoming" && (
+                                <>
+                                    <Button onClick={() => accept(authUser.id, user.id)}>
+                                        {t("friends.acceptRequest")}
+                                    </Button>
+                                    <Button onClick={() => decline(authUser.id, user.id)}>
+                                        {t("friends.decline")}
+                                    </Button>
+                                </>
+                            )}
+
+                            {relation === "outgoing" && (
+                                <Button onClick={() => cancel(authUser.id, user.id)}>
+                                    {t("friends.cancelRequest")}
+                                </Button>
+                            )}
+
+                            {relation === "none" && (
+                                <Button onClick={() => sendRequest(authUser.id, user.id)}>
+                                    {t("friends.addFriend")}
+                                </Button>
+                            )}
+                        </>
+                    )}
                 </div>
 
-                {user.bio && (
+                {isMe && showPostEditor && (
                     <Card className="mt-6 fade-in">
-                        <h2 className="text-xl font-semibold neon-text mb-2">About</h2>
-                        <p>{user.bio}</p>
+                        <PostEditor
+                            author={postAuthor}
+                            onSubmit={() => setShowPostEditor(false)}
+                        />
                     </Card>
                 )}
 
+                <Card className="mt-6">
+                    <h2 className="text-xl font-semibold mb-2">
+                        {t("profile.about")}
+                    </h2>
+
+                    {user.bio ? (
+                        <p>{user.bio}</p>
+                    ) : (
+                        <p className="opacity-50 italic">
+                            {t("profile.noDescription")}
+                        </p>
+                    )}
+                </Card>
+
                 <div className="flex flex-col gap-4 mt-6">
-                    <Post />
-                    <Post />
-                    <Post />
+
+                    {postsLoading && (
+                        <div className="opacity-60 text-center">
+                            {t("profile.loadingPosts")}
+                        </div>
+                    )}
+
+                    {!postsLoading && posts.length === 0 && (
+                        <div className="opacity-60 text-center">
+                            {t("profile.noPosts")}
+                        </div>
+                    )}
+
+                    {posts.map(post => (
+                        <Post
+                            key={post.id}
+                            post={post}
+                            author={{
+                                type: "user",
+                                user,
+                            }}
+                        />
+                    ))}
                 </div>
             </div>
-
-            {editOpen && <EditProfileModal user={user} onClose={() => setEditOpen(false)} />}
         </div>
     );
 }

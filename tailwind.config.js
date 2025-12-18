@@ -7,6 +7,12 @@ module.exports = {
     ],
     theme: {
         extend: {
+            screens: {
+                'tablet': '480px',
+                'laptop': '720px',
+                'desktop': '1440px',
+                'wide': '1960px',
+            },
             colors: {
                 primary: {
                     light: "#3B82F6",

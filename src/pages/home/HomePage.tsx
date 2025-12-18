@@ -1,41 +1,77 @@
-import Header from "@components/layout/Header";
-import Sidebar from "@components/layout/Sidebar";
-import RightSidebar from "@components/rightbar/RightSidebar";
+import { useEffect } from "react";
+
 import CreatePost from "@components/feed/CreatePost";
 import Post from "@components/feed/Post";
 
+import { usePostStore } from "@/store/postStore";
+import { useUserStore } from "@/store/userStore";
+import { useCommunityStore } from "@/store/communityStore";
+
+
 export default function HomePage() {
+    const posts = usePostStore(s => s.allPosts);
+    const loadFeed = usePostStore(s => s.loadFeed);
+    const loadCommunities = useCommunityStore(s => s.loadAll);
+
+    const getUserById = useUserStore(s => s.getById);
+    const getCommunityById = useCommunityStore(s => s.getById);
+
+    useEffect(() => {
+        loadFeed();
+        loadCommunities();
+    }, [loadFeed, loadCommunities]);
+
     return (
-        <div className="h-screen overflow-hidden bg-[var(--bg-main)] text-[var(--text-main)] hitech-bg">
-            <div className="pt-20 max-w-7xl mx-auto px-4 flex gap-6">
+        <main
+            className="
+                w-full
+                max-w-full mobile:max-w-full tablet:max-w-2xl laptop:max-w-3xl desktop:max-w-4xl
+                h-full overflow-y-auto
+                flex flex-col gap-3 tablet:gap-4
+                pb-6 tablet:pb-10
+                pr-1 tablet:pr-2
+            "
+        >
+            <CreatePost />
 
-                <div className="hidden lg:block w-56 sticky top-20 h-[calc(100vh-5rem)]">
-                    <Sidebar />
-                </div>
+            {posts.map(post => {
+                if (post.author.type === "user") {
+                    const author = getUserById(post.author.userId);
+                    if (!author) return null;
 
-                <main
-                    className="
-                        flex-1 max-w-2xl mx-auto
-                        h-[calc(100vh-5rem)]
-                        overflow-y-auto
-                        flex flex-col gap-4 pb-10
-                        pr-2
-                    "
-                >
-                    <CreatePost />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
-                    <Post />
-                </main>
+                    return (
+                        <Post
+                            key={post.id}
+                            post={post}
+                            author={{
+                                type: "user",
+                                user: author,
+                            }}
+                        />
+                    );
+                }
 
-                <div className="hidden xl:block w-64 sticky top-20 h-[calc(100vh-5rem)]">
-                    <RightSidebar />
-                </div>
+                const community = getCommunityById(
+                    post.author.communityId
+                );
+                if (!community) return null;
 
-            </div>
-        </div>
+                const senderUser = post.author.senderUserId
+                    ? getUserById(post.author.senderUserId)
+                    : undefined;
+
+                return (
+                    <Post
+                        key={post.id}
+                        post={post}
+                        author={{
+                            type: "community",
+                            community,
+                            senderUser,
+                        }}
+                    />
+                );
+            })}
+        </main>
     );
 }

@@ -1,6 +1,6 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 
 import { ThemeContext } from "@context/ThemeContext";
 import { LanguageContext } from "@context/LanguageContext";
@@ -20,26 +20,42 @@ export default function AuthPage() {
 
     const [isRightPanelActive, setIsRightPanelActive] = useState(false);
 
-    const [regName, setRegName] = useState("");
     const [regEmail, setRegEmail] = useState("");
     const [regPass, setRegPass] = useState("");
+    const [regUsername, setRegUsername] = useState("");
+    const [regName, setRegName] = useState("");
+    const [regSurname, setRegSurname] = useState("");
 
     const [logEmail, setLogEmail] = useState("");
     const [logPass, setLogPass] = useState("");
 
+    const user = useAuthStore(s => s.user);
+
+    if (user) {
+        return <Navigate to="/home" replace />;
+    }
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        const ok = await loginFn({ username: logEmail, password: logPass });
+
+        const payload = { identifier: logEmail, password: logPass };
+        console.log("AuthPage payload =", payload);
+
+        const ok = await loginFn(payload);
         if (ok) navigate("/home");
     };
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+
         const ok = await registerFn({
-            username: regEmail,
-            name: regName,
+            username: regUsername,
+            email: regEmail,
             password: regPass,
+            name: regName,
+            surname: regSurname,
         });
+
         if (ok) navigate("/home");
     };
 
@@ -50,7 +66,25 @@ export default function AuthPage() {
                     <form onSubmit={handleRegister}>
                         <h1 className="auth-title">{t("auth.register")}</h1>
 
-                        <input value={regName} onChange={(e) => setRegName(e.target.value)} type="text" placeholder={t("auth.fullName") || "Full Name"} />
+                        <input
+                            value={regUsername}
+                            onChange={(e) => setRegUsername(e.target.value)}
+                            type="text"
+                            placeholder={t("auth.username") || "Username"}
+                        />
+                        <input
+                            value={regName}
+                            onChange={e => setRegName(e.target.value)}
+                            type="text"
+                            placeholder={t("auth.name") || "Name"}
+                        />
+
+                        <input
+                            value={regSurname}
+                            onChange={e => setRegSurname(e.target.value)}
+                            type="text"
+                            placeholder={t("auth.surname") || "Surname"}
+                        />
                         <input value={regEmail} onChange={(e) => setRegEmail(e.target.value)} type="email" placeholder={t("auth.email")} />
                         <input value={regPass} onChange={(e) => setRegPass(e.target.value)} type="password" placeholder={t("auth.password")} />
 
@@ -68,7 +102,7 @@ export default function AuthPage() {
                     <form onSubmit={handleLogin}>
                         <h1 className="auth-title">{t("auth.login")}</h1>
 
-                        <input value={logEmail} onChange={(e) => setLogEmail(e.target.value)} type="email" placeholder={t("auth.email")} />
+                        <input value={logEmail} onChange={(e) => setLogEmail(e.target.value)} type="text" placeholder={t("auth.email")} />
                         <input value={logPass} onChange={(e) => setLogPass(e.target.value)} type="password" placeholder={t("auth.password")} />
 
                         {!isRightPanelActive && error && (

@@ -9,3 +9,28 @@
     box-shadow: 0 0 20px var(--primary-glow);
     transform: translateY(-2px);
 }
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0.6rem 1rem;
+    border-radius: 0.75rem;
+
+    color: var(--primary);
+    background: transparent;
+    border: 1px dashed var(--border-color);
+
+    transition: 0.25s;
+}
+
+.upload-btn:hover {
+    background: rgba(255,255,255,0.03);
+    box-shadow: 0 0 16px var(--primary-glow);
+    transform: translateY(-1px);
+}
+
+[data-theme="dark"] .upload-btn:hover {
+    background: rgba(255,0,150,0.06);
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Card from "@components/ui/Card";
 import Button from "@components/ui/Button";
 
@@ -8,6 +9,8 @@ const demoMembers = [
 ];
 
 export default function SettingsMembers() {
+    const { t } = useTranslation();
+
     return (
         <Card className="flex flex-col gap-4">
 
@@ -15,14 +18,14 @@ export default function SettingsMembers() {
                 <div key={m.id} className="flex items-center justify-between">
                     <div>
                         <div className="font-semibold">{m.name}</div>
-                        <div className="text-sm opacity-70">{m.role}</div>
+                        <div className="text-sm opacity-70">{t(`communitySettings.members.roles.${m.role}`)}</div>
                     </div>
 
                     <select className="p-2 bg-[var(--bg-surface)] border rounded">
-                        <option>Admin</option>
-                        <option>Moderator</option>
-                        <option>Editor</option>
-                        <option>Member</option>
+                        <option>{t("communitySettings.members.roles.admin")}</option>
+                        <option>{t("communitySettings.members.roles.moderator")}</option>
+                        <option>{t("communitySettings.members.roles.editor")}</option>
+                        <option>{t("communitySettings.members.roles.member")}</option>
                     </select>
                 </div>
             ))}

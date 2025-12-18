@@ -1,7 +1,17 @@
-import { Identifiable } from "@/domain/common/Identifiable";
-import { Timestamped } from "@/domain/common/Timestamped";
+export type ChatType = "private" | "group" | "community";
 
-export interface Chat extends Identifiable, Timestamped {
-    participants: string[];
-    messages: string[];
+export interface Chat {
+    id: string;
+    type: ChatType;
+
+    title?: string;
+    avatarUrl?: string;
+
+    members: string[];
+
+    communityId?: string;
+    userId?: string;
+
+    lastMessage: Message | null;
+    createdAt: string;
 }

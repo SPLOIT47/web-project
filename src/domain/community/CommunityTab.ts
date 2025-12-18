@@ -1,0 +1,1 @@
+export type CommunityTab = "all" | "my" | "manage" | "search";

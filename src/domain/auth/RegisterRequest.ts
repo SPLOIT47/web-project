@@ -1,6 +1,8 @@
-export interface RegisterRequest {
+export type RegisterRequest = {
     username: string;
-    password: string;
+    email: string;
+    password?: string;
+
     name: string;
-    email?: string;
-}
+    surname: string;
+};

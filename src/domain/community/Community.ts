@@ -4,6 +4,7 @@ import { AvatarEntity } from "@/domain/common/AvatarEntity";
 import { Subscribable } from "@/domain/common/Subscribable";
 import { AdminManageable } from "@/domain/common/AdminManageable";
 import { Postable } from "@/domain/common/Postable";
+import {CommunityTypeId} from "@/domain/community/CommunityTypeId";
 
 export interface Community
     extends Identifiable,
@@ -15,7 +16,7 @@ export interface Community
 {
     coverUrl: string;
     category: string;
-    type: "public" | "group" | "event";
+    type: CommunityTypeId;
 
     description?: string;
 }

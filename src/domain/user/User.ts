@@ -1,9 +1,9 @@
-import { Identifiable } from "@/domain/common/Identifiable";
-import { Timestamped } from "@/domain/common/Timestamped";
-import { AvatarEntity } from "@/domain/common/AvatarEntity";
-import { Subscribable } from "@/domain/common/Subscribable";
-import { Messageable } from "@/domain/common/Messageable";
-import { Postable } from "@/domain/common/Postable";
+import {AvatarEntity} from "@/domain/common/AvatarEntity";
+import {Timestamped} from "@/domain/common/Timestamped";
+import {Identifiable} from "@/domain/common/Identifiable";
+import {Subscribable} from "@/domain/common/Subscribable";
+import {Messageable} from "@/domain/common/Messageable";
+import {Postable} from "@/domain/common/Postable";
 
 export interface User
     extends Identifiable,
@@ -14,20 +14,20 @@ export interface User
         Postable
 {
     username: string;
+    email: string;
 
-    displayName: string;
+    name: string;
+    surname: string;
 
     bio?: string;
-
     birthday?: string;
-
     city?: string;
-
     education?: string;
 
     friends: string[];
+    incomingRequests: string[];
+    outgoingRequests: string[];
 
     communities: string[];
-
     languages?: string[];
 }

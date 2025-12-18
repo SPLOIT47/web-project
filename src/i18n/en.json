@@ -1,9 +1,341 @@
 {
+  "app": {
+    "name": "SocialNetwork"
+  },
   "auth": {
     "login": "Login",
     "email": "Email",
     "password": "Password",
+    "username": "Username",
+    "name": "Name",
+    "surname": "Surname",
     "submit": "Sign in",
-    "register": "Create account"
+    "register": "Create account",
+    "welcomeBack": "Welcome Back!",
+    "welcomeBackDesc": "To keep connected with us please login with your personal info",
+    "helloFriend": "Hello, Friend!",
+    "helloFriendDesc": "Enter your personal details and start journey with us"
+  },
+  "header": {
+    "search": "Search...",
+    "home": "Home",
+    "messages": "Messages",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "communities": "Communities"
+  },
+  "sidebar": {
+    "myProfile": "My Profile",
+    "messages": "Messages",
+    "friends": "Friends",
+    "communities": "Communities",
+    "settings": "Settings"
+  },
+  "post": {
+    "placeholder": "What's on your mind?",
+    "button": "Post",
+    "commentPlaceholder": "Write a comment...",
+    "send": "Send",
+    "likes": "{{count}} likes",
+    "comments": "{{count}} comments",
+    "addPhoto": "Add photo",
+    "publishedBy": "Published by"
+  },
+  "profile": {
+    "loadingProfile": "Loading profile...",
+    "notAuthenticated": "Not authenticated",
+    "livesIn": "Lives in",
+    "studiesAt": "Studies at",
+    "hideDetails": "Hide details",
+    "moreDetails": "More details",
+    "posts": "Posts",
+    "followers": "Followers",
+    "following": "Following",
+    "editProfile": "Edit Profile",
+    "addPost": "Add Post",
+    "about": "About",
+    "noDescription": "No description yet",
+    "loadingPosts": "Loading posts...",
+    "noPosts": "No posts yet",
+    "profileDetails": "Profile Details",
+    "birthDate": "Birth date",
+    "city": "City",
+    "education": "Education",
+    "friends": "Friends",
+    "languages": "Languages",
+    "message": "Messages"
+  },
+  "settings": {
+    "title": "Settings",
+    "profileSettings": "Profile Settings",
+    "yourName": "Your Name",
+    "username": "Username",
+    "email": "Email",
+    "saveChanges": "Save Changes",
+    "security": "Security",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "repeatNewPassword": "Repeat New Password",
+    "changePassword": "Change Password",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "toggleTheme": "Toggle Theme ({{theme}})",
+    "language": "Language",
+    "english": "English",
+    "russian": "Русский",
+    "account": "Account",
+    "logout": "Logout",
+    "deleteAccount": "Delete Account",
+    "confirmDelete": "Are you sure you want to delete your account?"
+  },
+  "friends": {
+    "title": "Friends",
+    "tabs": {
+      "friends": "Friends",
+      "requests": "Requests",
+      "outgoing": "Outgoing",
+      "search": "Search"
+    },
+    "noFriends": "No friends yet",
+    "noRequests": "No friend requests",
+    "noOutgoing": "No outgoing requests",
+    "searchPlaceholder": "Search for friends...",
+    "searchPeople": "Search people...",
+    "searching": "Searching...",
+    "addFriend": "Add Friend",
+    "acceptRequest": "Accept",
+    "rejectRequest": "Reject",
+    "decline": "Decline",
+    "cancelRequest": "Cancel",
+    "cancel": "Cancel",
+    "removeFriend": "Remove Friend",
+    "remove": "Remove",
+    "message": "Message"
+  },
+  "communities": {
+    "title": "Communities",
+    "createCommunity": "Create Community",
+    "tabs": {
+      "all": "All",
+      "my": "My Communities",
+      "manage": "Manage",
+      "search": "Search"
+    },
+    "members": "members",
+    "noCommunities": "No communities found",
+    "noCommunitiesHere": "No communities here",
+    "join": "Join",
+    "leave": "Leave",
+    "manage": "Manage"
+  },
+  "createCommunity": {
+    "title": "Create Community",
+    "name": "Community name",
+    "type": "Type",
+    "typePublic": "Public Page",
+    "typeGroup": "Group",
+    "typeEvent": "Event",
+    "category": "Category",
+    "categoryTechnology": "Technology",
+    "categoryDesign": "Design",
+    "categoryEducation": "Education",
+    "categoryScience": "Science",
+    "categoryEntertainment": "Entertainment",
+    "categorySports": "Sports",
+    "description": "Description",
+    "descriptionPlaceholder": "Write something about your community...",
+    "avatar": "Avatar",
+    "cover": "Cover",
+    "creating": "Creating...",
+    "create": "Create Community"
+  },
+  "chat": {
+    "select": "Select a chat",
+    "userFallback": "User",
+    "communityFallback": "Community",
+    "groupFallback": "Group chat",
+    "online": "online",
+    "members": "{{count}} members",
+    "communitySubtitle": "Community chat",
+    "title": "Chats",
+    "new": "New",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "typingOne": "Someone is typing…",
+    "typingMany": "Several people are typing…"
+  },
+  "modal": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "editProfile": {
+      "title": "Edit Profile",
+      "displayName": "Display Name",
+      "name": "Name",
+      "surname": "Surname",
+      "bio": "Bio",
+      "city": "City",
+      "education": "Education",
+      "website": "Website",
+      "save": "Save Changes",
+      "upload": "Upload",
+      "remove": "Remove",
+      "saving": "Saving..."
+    },
+    "addPost": {
+      "title": "Create Post",
+      "placeholder": "What's on your mind?",
+      "create": "Create Post"
+    },
+    "createChat": {
+      "title": "Create Chat",
+      "selectUsers": "Select users...",
+      "create": "Create Chat",
+      "private": "Private",
+      "group": "Group",
+      "groupName": "Group name",
+      "searchUsers": "Search users"
+    },
+    "chatInfo": {
+      "title": "Chat Info",
+      "members": "Members",
+      "leave": "Leave Chat",
+      "addMember": "Add member...",
+      "remove": "Remove",
+      "leaveChat": "Leave chat",
+      "deleteChat": "Delete chat"
+    },
+    "communityDetails": {
+      "title": "Community Details",
+      "description": "Description",
+      "category": "Category",
+      "type": "Type",
+      "created": "Created",
+      "members": "Members"
+    },
+    "communityFollowers": {
+      "title": "Community Followers",
+      "noFollowers": "No followers yet"
+    },
+    "confirmDelete": {
+      "title": "Confirm Delete",
+      "message": "Are you sure you want to delete this community? This action cannot be undone.",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "noResults": "No results found",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "communityPage": {
+    "loadingCommunity": "Loading community...",
+    "aboutCommunity": "About community",
+    "noDescription": "No description yet",
+    "requestToJoin": "Request to join",
+    "joinCommunity": "Join community",
+    "writeToCommunity": "Write to community",
+    "leaveCommunity": "Leave community",
+    "editCommunity": "Edit community",
+    "communityChats": "Community chats",
+    "deleteCommunity": "Delete community",
+    "noPosts": "No posts yet"
+  },
+  "communitySettings": {
+    "title": "Community Settings",
+    "tabs": {
+      "general": "General",
+      "details": "Details",
+      "appearance": "Appearance",
+      "members": "Members",
+      "permissions": "Permissions",
+      "delete": "Delete"
+    },
+    "general": {
+      "communityName": "Community name",
+      "category": "Category",
+      "description": "Description",
+      "save": "Save"
+    },
+    "details": {
+      "title": "Community details",
+      "shortDescription": "Short description",
+      "fullDescription": "Full description",
+      "tags": "Tags (comma separated)",
+      "status": "Status",
+      "open": "Open",
+      "closed": "Closed",
+      "opensAt": "Opens at",
+      "address": "Address",
+      "city": "City",
+      "street": "Street",
+      "building": "Building",
+      "contacts": "Contacts",
+      "email": "Email",
+      "phone": "Phone",
+      "telegram": "Telegram",
+      "vk": "VK",
+      "website": "Website",
+      "saveDetails": "Save details",
+      "cancel": "Cancel"
+    },
+    "appearance": {
+      "avatar": "Avatar",
+      "cover": "Cover",
+      "uploadAvatar": "Upload Avatar",
+      "uploadCover": "Upload Cover"
+    },
+    "members": {
+      "title": "Members",
+      "admins": "Admins",
+      "followers": "Followers",
+      "roles": {
+        "admin": "Admin",
+        "moderator": "Moderator",
+        "editor": "Editor",
+        "member": "Member"
+      }
+    },
+    "delete": {
+      "title": "Delete Community",
+      "warning": "This action cannot be undone",
+      "confirm": "Delete Community"
+    }
+  },
+  "communityRightbar": {
+    "about": "About",
+    "followers": "followers",
+    "publicCommunity": "Public community",
+    "closedCommunity": "Closed community",
+    "showDetails": "Show details",
+    "friendsInCommunity": "Friends in community",
+    "friends": "{{count}} friends",
+    "contacts": "Contacts",
+    "showAllFollowers": "Show all followers"
+  },
+  "fileUpload": {
+    "uploadImage": "Upload image",
+    "chooseFile": "Choose file"
   }
 }

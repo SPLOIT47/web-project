@@ -1,11 +1,16 @@
-import type { Identifiable } from "../common/Identifiable";
-import type { Timestamped } from "../common/Timestamped";
+type MessageAuthor =
+    | { type: "user"; userId: string }
+    | { type: "community"; communityId: string; senderUserId: string };
 
-export type MessageStatus = "sent" | "delivered" | "read";
-
-export interface Message extends Identifiable, Timestamped {
+interface Message {
+    id: string;
     chatId: string;
-    senderId: string;
+
+    author: MessageAuthor;
+
     text: string;
-    status: MessageStatus;
+    attachments?: string[];
+
+    createdAt: string;
+    status?: "sent" | "delivered" | "read";
 }

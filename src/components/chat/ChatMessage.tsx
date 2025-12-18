@@ -1,28 +1,18 @@
 import Surface from "@components/ui/Surface";
-import { ReactNode } from "react";
-
-type MessageStatus = "sent" | "delivered" | "read";
-
-interface Message {
-    from: "me" | "other";
-    text: string;
-    time: string;
-    status?: MessageStatus;
-}
+import { useAuthStore } from "@/store";
 
 export default function ChatMessage({ msg }: { msg: Message }) {
-    const isMe = msg.from === "me";
+    const authUser = useAuthStore(s => s.user);
 
-    const statusIcon: Record<MessageStatus, string> = {
+    const isMe =
+        msg.author.type === "user" &&
+        msg.author.userId === authUser?.id;
+
+    const statusIcon = {
         sent: "✓",
         delivered: "✓✓",
         read: "✓✓",
     };
-
-    const currentStatus: MessageStatus = msg.status ?? "sent";
-
-    const statusClass =
-        currentStatus === "read" ? "text-[var(--primary)]" : "opacity-60";
 
     return (
         <div className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
@@ -31,9 +21,10 @@ export default function ChatMessage({ msg }: { msg: Message }) {
                 <Surface
                     className={`
                         p-3 rounded-xl fade-in
-                        ${isMe
-                        ? "neon-pulse bg-[var(--primary)] text-white"
-                        : "bg-[var(--bg-surface)]"
+                        ${
+                        isMe
+                            ? "neon-pulse bg-[var(--primary)] text-white"
+                            : "bg-[var(--bg-surface)]"
                     }
                     `}
                 >
@@ -45,11 +36,22 @@ export default function ChatMessage({ msg }: { msg: Message }) {
                         isMe ? "justify-end" : "opacity-60"
                     }`}
                 >
-                    <span>{msg.time}</span>
+                    <span>
+                        {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })}
+                    </span>
 
-                    {isMe && (
-                        <span className={statusClass}>
-                            {statusIcon[currentStatus]}
+                    {isMe && msg.status && (
+                        <span
+                            className={
+                                msg.status === "read"
+                                    ? "text-[var(--primary)]"
+                                    : "opacity-60"
+                            }
+                        >
+                            {statusIcon[msg.status]}
                         </span>
                     )}
                 </div>

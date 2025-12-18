@@ -1,0 +1,1 @@
+export type FriendTab = "friends" | "requests" | "outgoing" | "search";

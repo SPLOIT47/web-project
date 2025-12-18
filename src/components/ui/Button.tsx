@@ -5,14 +5,24 @@ type ButtonProps = {
     onClick?: () => void;
     className?: string;
     type?: "button" | "submit";
+    disabled?: boolean;
 };
 
-export default function Button({ children, onClick, className = "", type = "button" }: ButtonProps) {
+export default function Button({
+                                   children,
+                                   onClick,
+                                   className = "",
+                                   type = "button",
+                                   disabled = false,
+                               }: ButtonProps) {
     return (
         <button
             type={type}
             onClick={onClick}
-            className={`neon-btn ${className}`}
+            disabled={disabled}
+            className={`neon-btn ${className} ${
+                disabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
             {children}
         </button>

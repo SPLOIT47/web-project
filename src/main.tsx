@@ -4,12 +4,14 @@ import App from "./App";
 import "@styles/globals.css";
 import "@i18n";
 import "@/icons/fontawesome";
-import {initFakeDatabase} from "@/infrastructure/mock/faker";
+import {seedMockDatabase} from "@/infrastructure/mock/seed";
+import {ServiceLocator} from "@/application/ServiceLocator";
+import {resetDb} from "@/infrastructure/mock/database";
 
-initFakeDatabase();
+ServiceLocator.useMockBackend()
+resetDb();
+seedMockDatabase();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
         <App />
-    </React.StrictMode>
 );

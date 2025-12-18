@@ -1,10 +1,10 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import { ServiceLocator } from "@/application/ServiceLocator";
 
 import type { User } from "@/domain/user/User";
 import type { LoginRequest } from "@/domain/auth/LoginRequest";
 import type { RegisterRequest } from "@/domain/auth/RegisterRequest";
+import {usePostStore} from "@/store/postStore";
 
 interface AuthState {
     user: User | null;
@@ -12,99 +12,109 @@ interface AuthState {
     loading: boolean;
     error: string | null;
 
-    isAuthenticated: boolean;
-
     login: (data: LoginRequest) => Promise<boolean>;
     register: (data: RegisterRequest) => Promise<boolean>;
     logout: () => Promise<void>;
     restoreSession: () => Promise<void>;
+    deleteAccount: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>()(
-    persist(
-        (set, get) => ({
-            user: null,
-            token: null,
+export const useAuthStore = create<AuthState>((set, get) => ({
+    user: null,
+    token: null,
+    loading: false,
+    error: null,
+
+    login: async (data) => {
+        set({ loading: true, error: null });
+
+        const response = await ServiceLocator.authService.login(data);
+
+        if (!response) {
+            set({
+                loading: false,
+                error: "Invalid credentials",
+            });
+            return false;
+        }
+
+        set({
+            user: response.user,
+            token: response.token,
             loading: false,
             error: null,
-            isAuthenticated: false,
+        });
 
-            login: async (data: LoginRequest) => {
-                set({ loading: true, error: null });
+        await usePostStore.getState().loadFeed();
 
-                const response = await ServiceLocator.authService.login(data);
+        return true;
+    },
 
-                if (!response) {
-                    set({
-                        loading: false,
-                        error: "Invalid credentials",
-                    });
-                    return false;
-                }
+    register: async (data) => {
+        set({ loading: true, error: null });
 
-                set({
-                    user: response.user,
-                    token: response.token,
-                    loading: false,
-                    error: null,
-                });
+        const response = await ServiceLocator.authService.register(data);
 
-                return true;
-            },
+        if (!response) {
+            set({
+                loading: false,
+                error: "User already exists",
+            });
+            return false;
+        }
 
-            register: async (data: RegisterRequest) => {
-                set({ loading: true, error: null });
+        set({
+            user: response.user,
+            token: response.token,
+            loading: false,
+            error: null,
+        });
 
-                const response = await ServiceLocator.authService.register(data);
+        return true;
+    },
 
-                if (!response) {
-                    set({
-                        loading: false,
-                        error: "User already exists",
-                    });
-                    return false;
-                }
+    logout: async () => {
+        await ServiceLocator.authService.logout();
 
-                set({
-                    user: response.user,
-                    token: response.token,
-                    loading: false,
-                    error: null,
-                });
+        set({
+            user: null,
+            token: null,
+            error: null,
+        });
+    },
 
-                return true;
-            },
+    restoreSession: async () => {
+        set({ loading: true });
 
-            logout: async () => {
-                await ServiceLocator.authService.logout();
+        const session = await ServiceLocator.authService.getCurrentSession();
 
-                set({
-                    user: null,
-                    token: null,
-                    error: null,
-                });
-            },
+        if (session) {
+            set({
+                user: session.user,
+                token: session.token,
+                loading: false,
+                error: null,
+            });
+        } else {
+            set({
+                user: null,
+                token: null,
+                loading: false,
+                error: null,
+            });
+        }
+    },
 
-            restoreSession: async () => {
-                set({ loading: true });
+    deleteAccount: async () => {
+        const user = get().user;
+        if (!user) return;
 
-                const session = await ServiceLocator.authService.getCurrentSession();
+        await ServiceLocator.authService.deleteAccount(user.id);
 
-                if (session) {
-                    set({
-                        user: session.user,
-                        token: session.token,
-                        loading: false,
-                        error: null,
-                    });
-                } else {
-                    set({
-                        loading: false,
-                        error: null,
-                    });
-                }
-            },
-        }),
-        { name: "auth-store" }
-    )
-);
+        set({
+            user: null,
+            token: null,
+            error: null,
+        });
+    },
+}));
