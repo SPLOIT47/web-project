@@ -1,5 +1,7 @@
+import {create} from "zustand";
 import { ServiceLocator } from "@/application/ServiceLocator";
 import type { CommunityDetails } from "@/domain/community/details/CommunityDetails";
+
 
 interface CommunityDetailsState {
     details: CommunityDetails | null;
