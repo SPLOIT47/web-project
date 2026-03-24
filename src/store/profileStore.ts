@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { ServiceLocator } from "@/application/ServiceLocator";
 import type { User } from "@/domain/user/User";
 import type { EditProfilePayload } from "@/domain/user/EditProfilePayload";
+import { useAuthStore } from "@/store/authStore";
+import { useUserStore } from "@/store/userStore";
 
 interface ProfileState {
     user: User | null;
@@ -9,8 +11,9 @@ interface ProfileState {
     error: string | null;
 
     loadProfile: (userId: string) => Promise<void>;
-    updateProfile: (data: EditProfilePayload) => Promise<void>;
+    updateProfile: (data: EditProfilePayload) => Promise<boolean>;
     clearProfile: () => void;
+    clearError: () => void;
 }
 
 export const useProfileStore = create<ProfileState>((set, get) => ({
@@ -36,9 +39,8 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     },
 
     updateProfile: async (data: EditProfilePayload) => {
-
         const user = get().user;
-        if (!user) return;
+        if (!user) return false;
 
         set({ loading: true, error: null });
 
@@ -48,17 +50,34 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
                 data
             );
 
-            console.log("updateProfile payload =", data);
-            console.log("updateProfile result  =", updated);
-
             set({ user: updated, loading: false });
+            useUserStore.getState().upsertMany([updated]);
+            const auth = useAuthStore.getState().user;
+            if (auth && updated.id === auth.id) {
+                useAuthStore.getState().patchUser({
+                    name: updated.name,
+                    surname: updated.surname,
+                    bio: updated.bio,
+                    birthday: updated.birthday,
+                    city: updated.city,
+                    education: updated.education,
+                    languages: updated.languages,
+                    avatarUrl: updated.avatarUrl,
+                });
+            }
+            return true;
         } catch (e) {
             console.error(e);
             set({ error: "Failed to update profile", loading: false });
+            return false;
         }
     },
 
     clearProfile: () => {
         set({ user: null, loading: false, error: null });
+    },
+
+    clearError: () => {
+        set({ error: null });
     },
 }));

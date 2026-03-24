@@ -15,6 +15,13 @@ import {CommunityDetailsService} from "@/application/chat/details/CommunityDetai
 import {MockCommunityDetailsService} from "@/infrastructure/mock/mockCommunityDetailsService";
 import {ChatService} from "@/application/chat/ChatService";
 import {FileService} from "@/application/file/FileService";
+import { HttpAuthService } from "@/infrastructure/http/HttpAuthService";
+import { HttpUserService } from "@/infrastructure/http/HttpUserService";
+import { HttpPostService } from "@/infrastructure/http/HttpPostService";
+import { HttpCommunityService } from "@/infrastructure/http/HttpCommunityService";
+import { HttpFileService } from "@/infrastructure/http/HttpFileService";
+import { HttpSearchService } from "@/infrastructure/http/HttpSearchService";
+import { HttpCommunityDetailsService } from "@/infrastructure/http/HttpCommunityDetailsService";
 
 export class ServiceLocator {
     static postService: PostService = new MockPostService();
@@ -38,6 +45,13 @@ export class ServiceLocator {
     }
 
     static useRealBackend() {
-        throw new Error("Real backend is not implemented yet");
+        this.postService = new HttpPostService();
+        this.userService = new HttpUserService();
+        this.chatService = new MockChatService();
+        this.communityService = new HttpCommunityService();
+        this.authService = new HttpAuthService();
+        this.fileService = new HttpFileService();
+        this.searchService = new HttpSearchService();
+        this.communityDetailsService = new HttpCommunityDetailsService();
     }
 }

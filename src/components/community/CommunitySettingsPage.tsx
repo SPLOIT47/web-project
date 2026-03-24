@@ -5,9 +5,12 @@ import { useTranslation } from "react-i18next";
 import Card from "@components/ui/Card";
 import Button from "@components/ui/Button";
 import Input from "@components/ui/Input";
+import AvatarUploader from "@components/ui/AvatarUploader";
+import { resolveMediaRef } from "@/infrastructure/http/mediaUrl";
 
 import { useCommunityDetailsStore } from "@/store/communityDetailsStore";
 import type { CommunityDetails } from "@/domain/community/details/CommunityDetails";
+import { ServiceLocator } from "@/application/ServiceLocator";
 
 export default function CommunityDetailsSettingsPage() {
     const { t } = useTranslation();
@@ -16,6 +19,8 @@ export default function CommunityDetailsSettingsPage() {
     const { details, load, update, loading } = useCommunityDetailsStore();
 
     const [form, setForm] = useState<CommunityDetails | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState("");
+    const [coverUrl, setCoverUrl] = useState("");
 
     useEffect(() => {
         if (id) load(id);
@@ -26,6 +31,15 @@ export default function CommunityDetailsSettingsPage() {
             setForm(details);
         }
     }, [details]);
+
+    useEffect(() => {
+        if (!id) return;
+        void (async () => {
+            const community = await ServiceLocator.communityService.getById(id);
+            setAvatarUrl(community?.avatarUrl ?? "");
+            setCoverUrl(community?.coverUrl ?? "");
+        })();
+    }, [id]);
 
     if (loading || !form) {
         return <div className="p-6 opacity-60">{t("common.loading")}</div>;
@@ -44,6 +58,41 @@ export default function CommunityDetailsSettingsPage() {
             <h1 className="text-2xl font-bold neon-text">
                 {t("communitySettings.details.title")}
             </h1>
+
+            <h3 className="font-semibold neon-text">
+                {t("communitySettings.tabs.appearance")}
+            </h3>
+
+            <div className="flex flex-col gap-4">
+                <div>
+                    <label className="opacity-80 mb-2 block">
+                        {t("createCommunity.avatar")}
+                    </label>
+                    <AvatarUploader
+                        value={avatarUrl}
+                        size={96}
+                        onChange={value => setAvatarUrl(value ?? "")}
+                    />
+                </div>
+
+                <div>
+                    <label className="opacity-80 mb-2 block">
+                        {t("createCommunity.cover")}
+                    </label>
+                    <AvatarUploader
+                        value={coverUrl}
+                        size={160}
+                        onChange={value => setCoverUrl(value ?? "")}
+                    />
+                    {resolveMediaRef(coverUrl) && (
+                        <img
+                            src={resolveMediaRef(coverUrl)}
+                            alt="community cover"
+                            className="mt-3 w-full max-w-lg h-32 rounded-xl object-cover border border-[var(--border-color)]"
+                        />
+                    )}
+                </div>
+            </div>
 
             <Input
                 value={form.shortDescription ?? ""}
@@ -218,6 +267,10 @@ export default function CommunityDetailsSettingsPage() {
 
                 <Button
                     onClick={async () => {
+                        await ServiceLocator.communityService.update(id!, {
+                            avatarUrl,
+                            coverUrl,
+                        });
                         await update(id!, form);
                         navigate(`/communities/${id}`);
                     }}

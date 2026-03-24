@@ -1,4 +1,5 @@
 import Icon from "@components/ui/Icon";
+import { resolveMediaRef } from "@/infrastructure/http/mediaUrl";
 
 type AvatarProps = {
     src?: string | null;
@@ -6,7 +7,7 @@ type AvatarProps = {
 };
 
 export default function Avatar({ src, size = 48 }: AvatarProps) {
-    const imageSrc = src && src.trim() !== "" ? src : undefined;
+    const imageSrc = resolveMediaRef(src);
 
     return (
         <div

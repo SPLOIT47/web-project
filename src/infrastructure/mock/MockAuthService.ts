@@ -1,4 +1,5 @@
-import type { AuthService } from "@/application/auth/AuthService";
+import type { AuthCredentialsUpdated, AuthService } from "@/application/auth/AuthService";
+import type { UpdateCredentialsPayload } from "@/domain/auth/UpdateCredentialsPayload";
 import type { LoginRequest } from "@/domain/auth/LoginRequest";
 import type { LoginResponse } from "@/domain/auth/LoginResponse";
 import type { RegisterRequest } from "@/domain/auth/RegisterRequest";
@@ -125,5 +126,31 @@ export class MockAuthService implements AuthService {
         session = null;
 
         return mockResponse(undefined);
+    }
+
+    async updateCredentials(
+        payload: UpdateCredentialsPayload,
+    ): Promise<AuthCredentialsUpdated> {
+        if (!session) {
+            throw new Error("Not logged in");
+        }
+        const db = loadDb();
+        const user = db.users.find(u => u.id === session!.user.id);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        if (payload.login !== undefined) {
+            user.username = payload.login;
+        }
+        if (payload.email !== undefined) {
+            user.email = payload.email;
+        }
+        session = { ...session, user };
+        saveDb(db);
+        return mockResponse({
+            userId: user.id,
+            login: user.username,
+            email: user.email,
+        });
     }
 }

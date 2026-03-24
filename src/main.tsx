@@ -8,9 +8,15 @@ import {seedMockDatabase} from "@/infrastructure/mock/seed";
 import {ServiceLocator} from "@/application/ServiceLocator";
 import {resetDb} from "@/infrastructure/mock/database";
 
-ServiceLocator.useMockBackend()
-resetDb();
-seedMockDatabase();
+const useMock = import.meta.env.VITE_USE_MOCK_BACKEND === "true";
+
+if (useMock) {
+    ServiceLocator.useMockBackend();
+    resetDb();
+    seedMockDatabase();
+} else {
+    ServiceLocator.useRealBackend();
+}
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
         <App />

@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { useAuthStore } from "@/store/authStore";
 import { useProfileStore } from "@/store/profileStore";
-import { usePostStore } from "@/store/postStore";
 import { useFriendsStore } from "@/store/friendsStore";
 import { useChatStore } from "@/store/chatStore";
 import { useModalStore } from "@/store/modalStore";
@@ -19,6 +18,9 @@ import PostEditor from "@components/post/PostEditor";
 import ProfileDetails from "./ProfileDetails";
 import { getUserDisplayName } from "@/presentation/user/userDisplayName";
 import type { PostAuthor } from "@/domain/post/PostAuthor";
+import type { Post } from "@/domain/post/Post";
+import { ServiceLocator } from "@/application/ServiceLocator";
+import { useUserStore } from "@/store/userStore";
 
 export default function ProfilePage() {
     const { t } = useTranslation();
@@ -27,7 +29,6 @@ export default function ProfilePage() {
 
     const authUser = useAuthStore(s => s.user);
     const isMe = !id || id === authUser?.id;
-    const targetUserId = isMe ? authUser?.id : id;
 
     const [showDetails, setShowDetails] = useState(false);
     const [showPostEditor, setShowPostEditor] = useState(false);
@@ -39,10 +40,40 @@ export default function ProfilePage() {
         updateProfile,
     } = useProfileStore();
 
-    const {
-        allPosts,
-        loading: postsLoading,
-    } = usePostStore();
+    const [profilePosts, setProfilePosts] = useState<Post[]>([]);
+    const [postsLoading, setPostsLoading] = useState(false);
+    const upsertUsers = useUserStore(s => s.upsertMany);
+
+    const reloadProfilePosts = useCallback(async (forUserId: string) => {
+        setPostsLoading(true);
+        try {
+            const list = await ServiceLocator.postService.getByAuthor({
+                type: "user",
+                userId: forUserId,
+            });
+            const commentAuthorIds = [
+                ...new Set(
+                    list
+                        .flatMap(post => post.comments.map(c => c.authorId))
+                        .filter(id => id && id !== forUserId),
+                ),
+            ];
+            if (commentAuthorIds.length > 0) {
+                const users = await ServiceLocator.userService.getBatch(
+                    commentAuthorIds,
+                );
+                if (users.length > 0) {
+                    upsertUsers(users);
+                }
+            }
+            setProfilePosts(list);
+        } catch (e) {
+            console.error(e);
+            setProfilePosts([]);
+        } finally {
+            setPostsLoading(false);
+        }
+    }, [upsertUsers]);
 
     const {
         getRelation,
@@ -58,11 +89,7 @@ export default function ProfilePage() {
     const openOrCreatePrivateChat =
         useChatStore(s => s.openOrCreatePrivateChat);
 
-    const posts = allPosts.filter(
-        p =>
-            p.author.type === "user" &&
-            p.author.userId === user?.id
-    );
+    const posts = profilePosts;
 
     useEffect(() => {
         if (!authUser) return;
@@ -70,6 +97,11 @@ export default function ProfilePage() {
         const targetId = isMe ? authUser.id : id!;
         loadProfile(targetId);
     }, [id, authUser, isMe, loadProfile]);
+
+    useEffect(() => {
+        if (!user?.id) return;
+        void reloadProfilePosts(user.id);
+    }, [user?.id, reloadProfilePosts]);
 
     if (profileLoading) {
         return (
@@ -231,7 +263,10 @@ export default function ProfilePage() {
                     <Card className="mt-6 fade-in">
                         <PostEditor
                             author={postAuthor}
-                            onSubmit={() => setShowPostEditor(false)}
+                            onSubmit={() => {
+                                setShowPostEditor(false);
+                                if (user?.id) void reloadProfilePosts(user.id);
+                            }}
                         />
                     </Card>
                 )}
@@ -272,6 +307,11 @@ export default function ProfilePage() {
                                 type: "user",
                                 user,
                             }}
+                            onDeleted={() =>
+                                setProfilePosts(prev =>
+                                    prev.filter(p => p.id !== post.id),
+                                )
+                            }
                         />
                     ))}
                 </div>

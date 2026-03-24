@@ -1,6 +1,7 @@
 import type { Post } from "@/domain/post/Post";
 import type { PostAuthor } from "@/domain/post/PostAuthor";
 import {PostAuthorFilter} from "@/domain/post/PostAuthorFilter";
+import type { Comment } from "@/domain/post/Comment";
 
 export interface CreatePostPayload {
     author: PostAuthor;
@@ -28,5 +29,5 @@ export interface PostService {
             authorId: string;
             text: string;
         }
-    ): Promise<void>;
+    ): Promise<Comment>;
 }

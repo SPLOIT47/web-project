@@ -18,6 +18,12 @@ export class MockUserService implements UserService {
         return mockResponse(db.users);
     }
 
+    async getBatch(ids: string[]): Promise<User[]> {
+        const db = loadDb();
+        const set = new Set(ids);
+        return mockResponse(db.users.filter(u => set.has(u.id)));
+    }
+
     async search(query: string): Promise<User[]> {
         const q = query.trim().toLowerCase();
         if (!q) return mockResponse([]);

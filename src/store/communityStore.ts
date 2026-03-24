@@ -7,6 +7,7 @@ interface CommunityState {
 
     loadAll: () => Promise<void>;
     getById: (id: string) => Community | undefined;
+    upsertMany: (incoming: Community[]) => void;
 }
 
 export const useCommunityStore = create<CommunityState>((set, get) => ({
@@ -19,4 +20,15 @@ export const useCommunityStore = create<CommunityState>((set, get) => ({
 
     getById: (id: string) =>
         get().communities.find(c => c.id === id),
+
+    upsertMany: incoming => {
+        if (incoming.length === 0) return;
+        set(state => {
+            const map = new Map(state.communities.map(c => [c.id, c]));
+            for (const c of incoming) {
+                map.set(c.id, c);
+            }
+            return { communities: [...map.values()] };
+        });
+    },
 }));

@@ -1,17 +1,28 @@
 import type { Community } from "@/domain/community/Community";
 import Icon from "@components/ui/Icon";
+import { resolveMediaRef } from "@/infrastructure/http/mediaUrl";
 
 type Props = {
     community: Community;
 };
 
 export default function CommunityHeader({ community }: Props) {
+    const coverSrc = resolveMediaRef(community.coverUrl);
+
     return (
         <div className="w-full h-40 mobile:h-48 tablet:h-56 laptop:h-60 relative">
 
-            <div
-                className="absolute inset-0 bg-gradient-to-r from-pink-700 to-purple-700 opacity-80 hitech-bg"
-            />
+            {coverSrc ? (
+                <img
+                    src={coverSrc}
+                    alt="community cover"
+                    className="absolute inset-0 w-full h-full object-cover"
+                />
+            ) : (
+                <div
+                    className="absolute inset-0 bg-gradient-to-r from-pink-700 to-purple-700 opacity-80 hitech-bg"
+                />
+            )}
 
             <div className="absolute inset-0 bg-black/40" />
 
@@ -25,7 +36,7 @@ export default function CommunityHeader({ community }: Props) {
             ">
 
                 <img
-                    src={community.avatarUrl}
+                    src={resolveMediaRef(community.avatarUrl)}
                     className="
                         w-16 h-16 mobile:w-24 mobile:h-24 tablet:w-32 tablet:h-32
                         rounded-xl object-cover

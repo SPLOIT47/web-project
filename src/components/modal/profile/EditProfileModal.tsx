@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import BaseModal from "@components/ui/modal/BaseModal";
@@ -24,10 +24,12 @@ export default function EditProfileModal({
     const { t } = useTranslation();
     const updateProfile = useProfileStore(s => s.updateProfile);
     const loading = useProfileStore(s => s.loading);
+    const saveError = useProfileStore(s => s.error);
+    const clearError = useProfileStore(s => s.clearError);
 
     const fileRef = useRef<HTMLInputElement>(null);
 
-    const [form, setForm] = useState<EditProfilePayload>({
+    const [form, setForm] = useState<EditProfilePayload>(() => ({
         name: user.name ?? "",
         surname: user.surname ?? "",
         bio: user.bio ?? "",
@@ -36,7 +38,22 @@ export default function EditProfileModal({
         education: user.education ?? "",
         languages: user.languages ?? [],
         avatarUrl: user.avatarUrl ?? "",
-    });
+    }));
+
+    useEffect(() => {
+        if (!open) return;
+        clearError();
+        setForm({
+            name: user.name ?? "",
+            surname: user.surname ?? "",
+            bio: user.bio ?? "",
+            birthday: user.birthday ?? "",
+            city: user.city ?? "",
+            education: user.education ?? "",
+            languages: user.languages ?? [],
+            avatarUrl: user.avatarUrl ?? "",
+        });
+    }, [open, user, clearError]);
 
     const updateField = <K extends keyof EditProfilePayload>(
         key: K,
@@ -52,7 +69,7 @@ export default function EditProfileModal({
         if (!file) return;
 
         const uploaded = await ServiceLocator.fileService.upload(file);
-        updateField("avatarUrl", uploaded.url);
+        updateField("avatarUrl", uploaded.id);
 
         e.target.value = "";
     };
@@ -143,6 +160,10 @@ export default function EditProfileModal({
                     value={form.education}
                     onChange={e => updateField("education", e.target.value)}
                 />
+
+                {saveError && (
+                    <p className="text-red-400 text-sm mb-3">{saveError}</p>
+                )}
 
                 <div className="flex justify-end gap-3">
                     <Button onClick={onClose} disabled={loading}>

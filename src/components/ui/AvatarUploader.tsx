@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import Avatar from "@components/ui/Avatar";
 import Icon from "@components/ui/Icon";
 import { ServiceLocator } from "@/application/ServiceLocator";
+import { resolveMediaRef } from "@/infrastructure/http/mediaUrl";
 
 type AvatarUploaderProps = {
     value?: string | null;
@@ -32,7 +33,7 @@ export default function AvatarUploader({
         if (!file) return;
 
         const uploaded = await ServiceLocator.fileService.upload(file);
-        onChange(uploaded.url);
+        onChange(uploaded.id);
 
         e.target.value = "";
     };
@@ -95,7 +96,7 @@ export default function AvatarUploader({
                         Загрузить
                     </button>
 
-                    {value && (
+                    {resolveMediaRef(value) && (
                         <button
                             className="w-full px-4 py-2 flex gap-2 items-center text-red-500 hover:bg-red-500/10"
                             onClick={handleRemove}

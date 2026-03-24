@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {CommunityPreview} from "@/presentation/community/CommunityPreview";
+import { resolveMediaRef } from "@/infrastructure/http/mediaUrl";
 
 type CommunityCardProps = {
     community: CommunityPreview
@@ -26,7 +27,7 @@ export default function CommunityCard({ community } : CommunityCardProps) {
             "
         >
             <img
-                src={community.coverUrl}
+                src={resolveMediaRef(community.coverUrl)}
                 className="
                     w-full mobile:w-20 mobile:h-20 
                     h-32 mobile:h-auto

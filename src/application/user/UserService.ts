@@ -4,6 +4,7 @@ import {User} from "@/domain/user/User";
 export interface UserService {
     getById(id: string): Promise<User | null>;
     getAll(): Promise<User[]>;
+    getBatch(ids: string[]): Promise<User[]>;
 
     search(query: string): Promise<User[]>;
 

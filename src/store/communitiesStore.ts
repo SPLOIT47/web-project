@@ -28,16 +28,15 @@ export const useCommunitiesStore = create<CommunitiesState>((set) => ({
         }
 
         if (tab === "my") {
-            const all = await service.getAll();
             set({
-                my: all.filter(c => c.followers.includes(userId)),
+                my: await service.getMine(userId),
             });
         }
 
         if (tab === "manage") {
-            const all = await service.getAll();
+            const mine = await service.getMine(userId);
             set({
-                manage: all.filter(
+                manage: mine.filter(
                     c => c.admins.includes(userId) || c.moderators?.includes(userId)
                 ),
             });

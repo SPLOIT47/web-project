@@ -1,4 +1,4 @@
-import {Suspense, useEffect} from "react";
+import { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ThemeProvider from "@context/ThemeContext";
 import LanguageProvider from "@context/LanguageContext";
@@ -27,14 +27,28 @@ export default function App() {
     const restoreSession = useAuthStore(s => s.restoreSession);
     const loadUsers = useUserStore(s => s.loadAll);
     const loadUserChats = useChatStore(s => s.loadUserChats);
-    const user = useAuthStore(s => s.user);
+    const [sessionReady, setSessionReady] = useState(false);
 
     useEffect(() => {
         (async () => {
+            await restoreSession();
+            setSessionReady(true);
             await loadUsers();
             await loadUserChats();
         })();
-    }, []);
+    }, [restoreSession, loadUsers, loadUserChats]);
+
+    if (!sessionReady) {
+        return (
+            <ThemeProvider>
+                <LanguageProvider>
+                    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--text-main)]">
+                        Loading…
+                    </div>
+                </LanguageProvider>
+            </ThemeProvider>
+        );
+    }
 
     return (
         <ThemeProvider>

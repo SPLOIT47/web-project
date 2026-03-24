@@ -4,7 +4,8 @@ import { ServiceLocator } from "@/application/ServiceLocator";
 import type { User } from "@/domain/user/User";
 import type { LoginRequest } from "@/domain/auth/LoginRequest";
 import type { RegisterRequest } from "@/domain/auth/RegisterRequest";
-import {usePostStore} from "@/store/postStore";
+import { usePostStore } from "@/store/postStore";
+import { useUserStore } from "@/store/userStore";
 
 interface AuthState {
     user: User | null;
@@ -17,6 +18,8 @@ interface AuthState {
     logout: () => Promise<void>;
     restoreSession: () => Promise<void>;
     deleteAccount: () => Promise<void>;
+    /** Локально обновить поля пользователя после настроек / профиля */
+    patchUser: (partial: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -45,6 +48,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             error: null,
         });
 
+        useUserStore.getState().upsertMany([response.user]);
         await usePostStore.getState().loadFeed();
 
         return true;
@@ -70,17 +74,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             error: null,
         });
 
+        useUserStore.getState().upsertMany([response.user]);
+
         return true;
     },
 
     logout: async () => {
-        await ServiceLocator.authService.logout();
-
-        set({
-            user: null,
-            token: null,
-            error: null,
-        });
+        try {
+            await ServiceLocator.authService.logout();
+        } finally {
+            set({
+                user: null,
+                token: null,
+                error: null,
+            });
+            usePostStore.getState().clear();
+        }
     },
 
     restoreSession: async () => {
@@ -95,6 +104,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 loading: false,
                 error: null,
             });
+            useUserStore.getState().upsertMany([session.user]);
+            await usePostStore.getState().loadFeed();
         } else {
             set({
                 user: null,
@@ -116,5 +127,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             token: null,
             error: null,
         });
+    },
+
+    patchUser: partial => {
+        set(state => ({
+            user: state.user ? { ...state.user, ...partial } : null,
+        }));
     },
 }));

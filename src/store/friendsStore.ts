@@ -49,6 +49,9 @@ export const useFriendsStore = create<FriendsState>((set, get) => ({
     },
 
     async sendRequest(fromId, toId) {
+        if (fromId === toId) {
+            return;
+        }
         await ServiceLocator.userService.sendFriendRequest(fromId, toId);
 
         set(state => ({

@@ -4,6 +4,7 @@ import type {
 } from "@/application/post/PostService";
 
 import type { Post } from "@/domain/post/Post";
+import type { Comment } from "@/domain/post/Comment";
 import type { PostAuthorFilter } from "@/domain/post/PostAuthorFilter";
 
 import { faker } from "@faker-js/faker";
@@ -136,24 +137,26 @@ export class MockPostService implements PostService {
     async addComment(
         postId: string,
         payload: { authorId: string; text: string }
-    ): Promise<void> {
+    ): Promise<Comment> {
         const db = loadDb();
         const post = db.posts.find(p => p.id === postId);
-        if (!post) return mockResponse(undefined);
+        if (!post) throw new Error("Post not found");
 
         const now = new Date().toISOString();
 
-        post.comments.push({
+        const comment: Comment = {
             id: crypto.randomUUID(),
             authorId: payload.authorId,
             text: payload.text,
             createdAt: now,
             updatedAt: now,
-        });
+        };
+
+        post.comments.push(comment);
 
         post.updatedAt = now;
         saveDb(db);
 
-        return mockResponse(undefined);
+        return mockResponse(comment);
     }
 }

@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # С хоста в браузере: Gateway должен быть доступен по этому URL (порт проброшен из compose бэка)
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:4000}
+        VITE_USE_MOCK_BACKEND: ${VITE_USE_MOCK_BACKEND:-false}
+    image: itmo-web-frontend:local
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    restart: unless-stopped

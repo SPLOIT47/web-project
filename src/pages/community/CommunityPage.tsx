@@ -36,6 +36,7 @@ export default function CommunityPage() {
         load,
         follow,
         unfollow,
+        removePost,
     } = useCommunityPageStore();
 
     useEffect(() => {
@@ -169,6 +170,7 @@ export default function CommunityPage() {
                                     communityId: community.id,
                                     senderUserId: authUser.id,
                                 }}
+                                onSubmit={() => id && load(id)}
                             />
                         </Card>
                     )}
@@ -185,6 +187,7 @@ export default function CommunityPage() {
                                 key={post.id}
                                 post={post}
                                 author={author}
+                                onDeleted={() => removePost(post.id)}
                             />
                         ))}
                     </div>

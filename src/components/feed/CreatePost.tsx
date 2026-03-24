@@ -29,8 +29,12 @@ export default function CreatePost() {
     const handlePost = async () => {
         if (!canPost) return;
 
-        await createPost(author, content.trim());
-        setContent("");
+        try {
+            await createPost(author, content.trim());
+            setContent("");
+        } catch {
+            /* ошибка уже в postStore + DEV-лог */
+        }
     };
 
     return (

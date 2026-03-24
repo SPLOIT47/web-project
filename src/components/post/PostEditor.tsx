@@ -41,9 +41,15 @@ export default function PostEditor({
             )
             : [];
 
-        const imageUrls = uploaded.map(f => f.url);
+        // В пост сохраняем mediaId (стабильный идентификатор), а не временный presigned URL.
+        // Иначе ссылки истекают, и картинка в ленте перестаёт отображаться.
+        const mediaRefs = uploaded.map(f => f.id);
 
-        await createPost(author, content.trim(), imageUrls);
+        try {
+            await createPost(author, content.trim(), mediaRefs);
+        } catch {
+            return;
+        }
 
         setContent("");
         setFiles([]);

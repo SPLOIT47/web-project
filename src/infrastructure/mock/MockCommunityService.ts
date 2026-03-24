@@ -22,6 +22,13 @@ export class MockCommunityService implements CommunityService {
         return mockResponse(db.communities);
     }
 
+    async getMine(userId: string): Promise<Community[]> {
+        const db = loadDb();
+        return mockResponse(
+            db.communities.filter(c => c.followers.includes(userId)),
+        );
+    }
+
     async getPosts(communityId: string): Promise<Post[]> {
         const db = loadDb();
 
