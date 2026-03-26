@@ -19,10 +19,9 @@ export async function httpRequest<T = Json>(
     init: RequestInit = {},
 ): Promise<T> {
     const base = getApiBase();
-    if (!base) {
-        throw new Error("VITE_API_BASE_URL is not set");
-    }
-    const url = `${base}${path.startsWith("/") ? path : `/${path}`}`;
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    // If base is empty, use same-origin relative URLs (e.g. `/api/auth/register`).
+    const url = base ? `${base}${normalizedPath}` : normalizedPath;
 
     const headers = new Headers(init.headers);
     const token = getStoredToken();
