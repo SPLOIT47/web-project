@@ -5,9 +5,11 @@
  * - For local dev: set e.g. `http://localhost:4000`
  */
 export function getApiBase(): string {
-    const runtimeRaw = String((window as any)?.__APP_CONFIG__?.apiBaseUrl ?? "").trim();
-    const buildtimeRaw = String(import.meta.env.VITE_API_BASE_URL ?? "").trim();
-    const raw = runtimeRaw || buildtimeRaw;
+    const runtimeValue = (window as any)?.__APP_CONFIG__?.apiBaseUrl;
+    const hasRuntimeValue = runtimeValue !== undefined && runtimeValue !== null;
+    const raw = hasRuntimeValue
+        ? String(runtimeValue).trim()
+        : String(import.meta.env.VITE_API_BASE_URL ?? "").trim();
     if (!raw) return "";
     return raw.replace(/\/$/, "");
 }
