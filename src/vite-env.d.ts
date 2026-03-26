@@ -9,3 +9,17 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv;
 }
+
+declare global {
+    interface Window {
+        __APP_CONFIG__?: {
+            /**
+             * Runtime API base URL (no trailing slash).
+             * If empty, frontend will use same-origin relative URLs (e.g. `/api/...`).
+             */
+            apiBaseUrl?: string;
+        };
+    }
+}
+
+export {};
