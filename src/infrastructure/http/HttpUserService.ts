@@ -40,11 +40,22 @@ export class HttpUserService implements UserService {
     }
 
     async getBatch(ids: string[]): Promise<User[]> {
+        if (import.meta.env.DEV) {
+            console.debug("[profiles/batch] raw ids", ids);
+        }
         const normalized = ids
             .map((id) => (typeof id === "string" ? id.trim() : ""))
             .filter(Boolean);
         const unique = [...new Set(normalized)];
         const valid = unique.filter(isUuidString);
+        if (import.meta.env.DEV) {
+            const invalid = unique.filter((id) => !isUuidString(id));
+            console.debug("[profiles/batch] normalized", unique);
+            console.debug("[profiles/batch] valid", valid);
+            if (invalid.length > 0) {
+                console.warn("[profiles/batch] invalid ids filtered", invalid);
+            }
+        }
         if (valid.length === 0) return [];
         try {
             const res = await httpRequest<BatchProfilesResponse>("/api/profiles/batch", {
@@ -61,6 +72,12 @@ export class HttpUserService implements UserService {
                 typeof e.message === "string" &&
                 e.message.toLowerCase().includes("uuid")
             ) {
+                if (import.meta.env.DEV) {
+                    console.error("[profiles/batch] backend 400 uuid", {
+                        sent: valid,
+                        error: e.body ?? e.message,
+                    });
+                }
                 return [];
             }
             throw e;
