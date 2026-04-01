@@ -62,7 +62,10 @@ export const usePostStore = create<PostState>((set, get) => ({
             }
 
             if (userIds.size > 0) {
-                if (import.meta.env.DEV) {
+                if (
+                    import.meta.env.DEV ||
+                    import.meta.env.VITE_DEBUG_PROFILE_BATCH === "true"
+                ) {
                     console.debug("[loadFeed] author/comment userIds", [...userIds]);
                 }
                 const users = await ServiceLocator.userService.getBatch([

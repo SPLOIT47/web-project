@@ -25,6 +25,11 @@ type FriendRequestRow = {
     status: string;
 };
 
+function isProfilesBatchUuidValidationError(e: HttpError): boolean {
+    const blob = JSON.stringify(e.body ?? e.message).toLowerCase();
+    return blob.includes("uuid");
+}
+
 export class HttpUserService implements UserService {
     async getById(id: string): Promise<User | null> {
         try {
@@ -40,7 +45,10 @@ export class HttpUserService implements UserService {
     }
 
     async getBatch(ids: string[]): Promise<User[]> {
-        if (import.meta.env.DEV) {
+        const verbose =
+            import.meta.env.DEV ||
+            import.meta.env.VITE_DEBUG_PROFILE_BATCH === "true";
+        if (verbose) {
             console.debug("[profiles/batch] raw ids", ids);
         }
         const normalized = ids
@@ -48,13 +56,13 @@ export class HttpUserService implements UserService {
             .filter(Boolean);
         const unique = [...new Set(normalized)];
         const valid = unique.filter(isUuidString);
-        if (import.meta.env.DEV) {
-            const invalid = unique.filter((id) => !isUuidString(id));
+        const invalid = unique.filter((id) => !isUuidString(id));
+        if (verbose) {
             console.debug("[profiles/batch] normalized", unique);
             console.debug("[profiles/batch] valid", valid);
-            if (invalid.length > 0) {
-                console.warn("[profiles/batch] invalid ids filtered", invalid);
-            }
+        }
+        if (invalid.length > 0) {
+            console.warn("[profiles/batch] dropped non-UUID ids before request", invalid);
         }
         if (valid.length === 0) return [];
         try {
@@ -64,20 +72,16 @@ export class HttpUserService implements UserService {
             });
             return res.profiles.map(p => mapApiProfileToUser(p));
         } catch (e) {
+            if (e instanceof HttpError && e.status === 400) {
+                console.warn("[profiles/batch] backend 400", {
+                    sentIds: valid,
+                    message: e.message,
+                    body: e.body,
+                });
+            }
             // Some environments may occasionally produce mixed/non-UUID ids in upstream services.
             // Do not crash feed/friends screens on this validation error.
-            if (
-                e instanceof HttpError &&
-                e.status === 400 &&
-                typeof e.message === "string" &&
-                e.message.toLowerCase().includes("uuid")
-            ) {
-                if (import.meta.env.DEV) {
-                    console.error("[profiles/batch] backend 400 uuid", {
-                        sent: valid,
-                        error: e.body ?? e.message,
-                    });
-                }
+            if (e instanceof HttpError && e.status === 400 && isProfilesBatchUuidValidationError(e)) {
                 return [];
             }
             throw e;
