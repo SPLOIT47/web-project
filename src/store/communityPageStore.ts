@@ -56,9 +56,11 @@ export const useCommunityPageStore = create<CommunityPageState>((set) => ({
         const userIds = new Set<string>();
         for (const p of posts) {
             if (p.author.type === "user") {
-                userIds.add(p.author.userId);
+                if (isUuidString(p.author.userId)) {
+                    userIds.add(p.author.userId);
+                }
             } else {
-                if (p.author.senderUserId) {
+                if (p.author.senderUserId && isUuidString(p.author.senderUserId)) {
                     userIds.add(p.author.senderUserId);
                 }
             }

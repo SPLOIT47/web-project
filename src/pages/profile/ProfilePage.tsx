@@ -21,6 +21,7 @@ import type { PostAuthor } from "@/domain/post/PostAuthor";
 import type { Post } from "@/domain/post/Post";
 import { ServiceLocator } from "@/application/ServiceLocator";
 import { useUserStore } from "@/store/userStore";
+import { isUuidString } from "@/utils/uuid";
 
 export default function ProfilePage() {
     const { t } = useTranslation();
@@ -55,7 +56,12 @@ export default function ProfilePage() {
                 ...new Set(
                     list
                         .flatMap(post => post.comments.map(c => c.authorId))
-                        .filter(id => id && id !== forUserId),
+                        .filter(
+                            id =>
+                                id &&
+                                id !== forUserId &&
+                                isUuidString(id),
+                        ),
                 ),
             ];
             if (commentAuthorIds.length > 0) {
