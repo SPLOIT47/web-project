@@ -2,7 +2,7 @@ import type { UserService } from "@/application/user/UserService";
 import type { User } from "@/domain/user/User";
 import type { EditProfilePayload } from "@/domain/user/EditProfilePayload";
 import { isUuidString } from "@/utils/uuid";
-import { httpRequest } from "./httpClient";
+import { HttpError, httpRequest } from "./httpClient";
 import {
     type ApiProfile,
     mapApiProfileToUser,
@@ -46,11 +46,25 @@ export class HttpUserService implements UserService {
         const unique = [...new Set(normalized)];
         const valid = unique.filter(isUuidString);
         if (valid.length === 0) return [];
-        const res = await httpRequest<BatchProfilesResponse>("/api/profiles/batch", {
-            method: "POST",
-            body: JSON.stringify({ ids: valid }),
-        });
-        return res.profiles.map(p => mapApiProfileToUser(p));
+        try {
+            const res = await httpRequest<BatchProfilesResponse>("/api/profiles/batch", {
+                method: "POST",
+                body: JSON.stringify({ ids: valid }),
+            });
+            return res.profiles.map(p => mapApiProfileToUser(p));
+        } catch (e) {
+            // Some environments may occasionally produce mixed/non-UUID ids in upstream services.
+            // Do not crash feed/friends screens on this validation error.
+            if (
+                e instanceof HttpError &&
+                e.status === 400 &&
+                typeof e.message === "string" &&
+                e.message.toLowerCase().includes("uuid")
+            ) {
+                return [];
+            }
+            throw e;
+        }
     }
 
     async search(query: string): Promise<User[]> {
