@@ -40,7 +40,10 @@ export class HttpUserService implements UserService {
     }
 
     async getBatch(ids: string[]): Promise<User[]> {
-        const unique = [...new Set(ids.map(id => id.trim()).filter(Boolean))];
+        const normalized = ids
+            .map((id) => (typeof id === "string" ? id.trim() : ""))
+            .filter(Boolean);
+        const unique = [...new Set(normalized)];
         const valid = unique.filter(isUuidString);
         if (valid.length === 0) return [];
         const res = await httpRequest<BatchProfilesResponse>("/api/profiles/batch", {
@@ -102,7 +105,9 @@ export class HttpUserService implements UserService {
         const rows = await httpRequest<FriendRequestRow[]>(
             "/api/friends/requests/incoming",
         );
-        const ids = rows.map(r => r.requesterUserId).filter(id => id !== userId);
+        const ids = rows
+            .map((r) => r?.requesterUserId)
+            .filter((id): id is string => typeof id === "string" && isUuidString(id) && id !== userId);
         return this.getBatch(ids);
     }
 
@@ -110,7 +115,9 @@ export class HttpUserService implements UserService {
         const rows = await httpRequest<FriendRequestRow[]>(
             "/api/friends/requests/outgoing",
         );
-        const ids = rows.map(r => r.targetUserId);
+        const ids = rows
+            .map((r) => r?.targetUserId)
+            .filter((id): id is string => typeof id === "string" && isUuidString(id));
         return this.getBatch(ids);
     }
 
