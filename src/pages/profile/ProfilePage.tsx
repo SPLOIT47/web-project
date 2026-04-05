@@ -20,6 +20,7 @@ import { getUserDisplayName } from "@/presentation/user/userDisplayName";
 import type { PostAuthor } from "@/domain/post/PostAuthor";
 import type { Post } from "@/domain/post/Post";
 import { ServiceLocator } from "@/application/ServiceLocator";
+import type { FriendRelation } from "@/domain/friend/FriendRelation";
 import { useUserStore } from "@/store/userStore";
 import { isUuidString } from "@/utils/uuid";
 
@@ -109,6 +110,48 @@ export default function ProfilePage() {
         void reloadProfilePosts(user.id);
     }, [user?.id, reloadProfilePosts]);
 
+    const [profileRelation, setProfileRelation] =
+        useState<FriendRelation | null>(null);
+    const [friendsCount, setFriendsCount] = useState<number | null>(null);
+
+    const refreshFriendsCount = useCallback(async () => {
+        if (!authUser?.id) return;
+        const list = await ServiceLocator.userService.getFriends(authUser.id);
+        setFriendsCount(list.length);
+    }, [authUser?.id]);
+
+    const refreshRelation = useCallback(async () => {
+        if (!authUser?.id || !user?.id || isMe) return;
+        const r = await ServiceLocator.userService.getFriendRelation(
+            authUser.id,
+            user.id,
+        );
+        setProfileRelation(r);
+    }, [authUser?.id, user?.id, isMe]);
+
+    useEffect(() => {
+        if (!authUser?.id || !user?.id) return;
+
+        if (isMe) {
+            setProfileRelation(null);
+            void refreshFriendsCount();
+            return;
+        }
+
+        let cancelled = false;
+        ServiceLocator.userService
+            .getFriendRelation(authUser.id, user.id)
+            .then(r => {
+                if (!cancelled) setProfileRelation(r);
+            })
+            .catch(() => {
+                if (!cancelled) setProfileRelation(null);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [authUser?.id, user?.id, isMe, refreshFriendsCount]);
+
     if (profileLoading) {
         return (
             <div className="p-6 text-center opacity-60">
@@ -125,8 +168,8 @@ export default function ProfilePage() {
         );
     }
 
-    const relation = getRelation(user.id);
-
+    const relation: FriendRelation =
+        profileRelation ?? getRelation(user.id);
 
     const handleMessage = async () => {
         await openOrCreatePrivateChat(user.id);
@@ -193,7 +236,14 @@ export default function ProfilePage() {
                                 <b>{posts.length}</b> {t("profile.posts")}
                             </div>
                             <div>
-                                <b>{user.friends.length}</b> {t("profile.friends")}
+                                <b>
+                                    {isMe
+                                        ? friendsCount === null
+                                            ? "…"
+                                            : friendsCount
+                                        : "—"}
+                                </b>{" "}
+                                {t("profile.friends")}
                             </div>
                         </div>
                     </div>
@@ -231,9 +281,10 @@ export default function ProfilePage() {
                             {relation === "friends" && (
                                 <Button
                                     className="bg-red-600"
-                                    onClick={() =>
-                                        remove(authUser.id, user.id)
-                                    }
+                                    onClick={async () => {
+                                        await remove(authUser.id, user.id);
+                                        await refreshRelation();
+                                    }}
                                 >
                                     {t("friends.removeFriend")}
                                 </Button>
@@ -241,23 +292,56 @@ export default function ProfilePage() {
 
                             {relation === "incoming" && (
                                 <>
-                                    <Button onClick={() => accept(authUser.id, user.id)}>
+                                    <Button
+                                        onClick={async () => {
+                                            await accept(
+                                                authUser.id,
+                                                user.id,
+                                            );
+                                            await refreshRelation();
+                                            await refreshFriendsCount();
+                                        }}
+                                    >
                                         {t("friends.acceptRequest")}
                                     </Button>
-                                    <Button onClick={() => decline(authUser.id, user.id)}>
+                                    <Button
+                                        onClick={async () => {
+                                            await decline(
+                                                authUser.id,
+                                                user.id,
+                                            );
+                                            await refreshRelation();
+                                        }}
+                                    >
                                         {t("friends.decline")}
                                     </Button>
                                 </>
                             )}
 
                             {relation === "outgoing" && (
-                                <Button onClick={() => cancel(authUser.id, user.id)}>
+                                <Button
+                                    onClick={async () => {
+                                        await cancel(
+                                            authUser.id,
+                                            user.id,
+                                        );
+                                        await refreshRelation();
+                                    }}
+                                >
                                     {t("friends.cancelRequest")}
                                 </Button>
                             )}
 
                             {relation === "none" && (
-                                <Button onClick={() => sendRequest(authUser.id, user.id)}>
+                                <Button
+                                    onClick={async () => {
+                                        await sendRequest(
+                                            authUser.id,
+                                            user.id,
+                                        );
+                                        await refreshRelation();
+                                    }}
+                                >
                                     {t("friends.addFriend")}
                                 </Button>
                             )}

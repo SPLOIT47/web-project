@@ -2,7 +2,7 @@ import type { FileService } from "@/application/file/FileService";
 import type { UploadedFile } from "@/domain/file/UploadedFile";
 import { getApiBase } from "./apiConfig";
 import { getStoredToken } from "./tokenStorage";
-import { httpRequest } from "./httpClient";
+import { applyAuthToHeaders, httpRequest } from "./httpClient";
 
 type UploadResponse = {
     mediaId: string;
@@ -29,12 +29,13 @@ export class HttpFileService implements FileService {
         form.append("file", file);
         form.append("kind", "avatar");
 
+        const headers = new Headers();
+        applyAuthToHeaders(headers);
+
         const res = await fetch(`${base}/api/media/upload`, {
             method: "POST",
             body: form,
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+            headers,
             credentials: "include",
         });
 

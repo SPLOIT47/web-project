@@ -1,4 +1,5 @@
 import type { UserService } from "@/application/user/UserService";
+import type { FriendRelation } from "@/domain/friend/FriendRelation";
 import type { User } from "@/domain/user/User";
 import type { EditProfilePayload } from "@/domain/user/EditProfilePayload";
 import { isUuidString } from "@/utils/uuid";
@@ -187,5 +188,28 @@ export class HttpUserService implements UserService {
             `/api/friends/requests/${encodeURIComponent(toId)}`,
             { method: "DELETE" },
         );
+    }
+
+    async getFriendRelation(
+        _viewerId: string,
+        targetUserId: string,
+    ): Promise<FriendRelation> {
+        type Api = {
+            relation: "self" | "friends" | "incoming" | "outgoing" | "none";
+        };
+        const res = await httpRequest<Api>(
+            `/api/friends/relation/${encodeURIComponent(targetUserId)}`,
+        );
+        const r = res.relation;
+        if (r === "self") return "none";
+        if (
+            r === "friends" ||
+            r === "incoming" ||
+            r === "outgoing" ||
+            r === "none"
+        ) {
+            return r;
+        }
+        return "none";
     }
 }

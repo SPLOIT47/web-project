@@ -1,3 +1,4 @@
+import type { FriendRelation } from "@/domain/friend/FriendRelation";
 import {EditProfilePayload} from "@/domain/user/EditProfilePayload";
 import {User} from "@/domain/user/User";
 
@@ -25,4 +26,12 @@ export interface UserService {
     declineFriendRequest(userId: string, fromId: string): Promise<void>;
     removeFriend(userId: string, friendId: string): Promise<void>;
     cancelFriendRequest(fromId: string, toId: string): Promise<void>;
+
+    /**
+     * Текущий пользователь — из JWT на бэкенде; viewerId нужен для мока.
+     */
+    getFriendRelation(
+        viewerId: string,
+        targetUserId: string,
+    ): Promise<FriendRelation>;
 }

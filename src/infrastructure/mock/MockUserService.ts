@@ -1,4 +1,5 @@
 import type { UserService } from "@/application/user/UserService";
+import type { FriendRelation } from "@/domain/friend/FriendRelation";
 import type { User } from "@/domain/user/User";
 import type { EditProfilePayload } from "@/domain/user/EditProfilePayload";
 
@@ -228,5 +229,28 @@ export class MockUserService implements UserService {
 
         saveDb(db);
         return mockResponse(undefined);
+    }
+
+    async getFriendRelation(
+        viewerId: string,
+        targetUserId: string,
+    ): Promise<FriendRelation> {
+        if (viewerId === targetUserId) {
+            return mockResponse("none");
+        }
+        const db = loadDb();
+        const viewer = db.users.find(u => u.id === viewerId);
+        if (!viewer) return mockResponse("none");
+
+        if (viewer.friends.includes(targetUserId)) {
+            return mockResponse("friends");
+        }
+        if (viewer.incomingRequests.includes(targetUserId)) {
+            return mockResponse("incoming");
+        }
+        if (viewer.outgoingRequests.includes(targetUserId)) {
+            return mockResponse("outgoing");
+        }
+        return mockResponse("none");
     }
 }

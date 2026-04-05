@@ -1,6 +1,14 @@
 import { getApiBase } from "./apiConfig";
 import { getStoredToken } from "./tokenStorage";
 
+export function applyAuthToHeaders(headers: Headers): void {
+    headers.delete("authorization");
+    const token = getStoredToken();
+    if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+    }
+}
+
 export class HttpError extends Error {
     constructor(
         message: string,
@@ -24,10 +32,7 @@ export async function httpRequest<T = Json>(
     const url = base ? `${base}${normalizedPath}` : normalizedPath;
 
     const headers = new Headers(init.headers);
-    const token = getStoredToken();
-    if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-    }
+    applyAuthToHeaders(headers);
     if (
         init.body &&
         typeof init.body === "string" &&

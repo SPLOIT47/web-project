@@ -170,7 +170,9 @@ export default function Post({ post, author, onDeleted }: Props) {
         setComment("");
         try {
             const saved = await addComment(post.id, text);
-            setComments(prev => [...prev, saved]);
+            setComments(prev =>
+                prev.some(c => c.id === saved.id) ? prev : [...prev, saved],
+            );
             setShowComments(true);
         } catch (e) {
             setComment(text);

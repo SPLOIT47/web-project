@@ -15,7 +15,8 @@ import {
 
 type AuthApiResponse = {
     user: ApiUserPayload;
-    token: string;
+    token?: string;
+    accessToken?: string;
 };
 
 type MeAuthResponse = {
@@ -34,9 +35,13 @@ export class HttpAuthService implements AuthService {
                     password: data.password,
                 }),
             });
-            setStoredToken(res.token);
+            const accessToken = res.token ?? res.accessToken;
+            if (!accessToken) {
+                return null;
+            }
+            setStoredToken(accessToken);
             const user = await this.loadUserWithProfile(res.user);
-            return { user, token: res.token };
+            return { user, token: accessToken };
         } catch {
             return null;
         }
@@ -57,9 +62,13 @@ export class HttpAuthService implements AuthService {
                     surname: data.surname,
                 }),
             });
-            setStoredToken(res.token);
+            const accessToken = res.token ?? res.accessToken;
+            if (!accessToken) {
+                return null;
+            }
+            setStoredToken(accessToken);
             const user = await this.loadUserWithProfile(res.user);
-            return { user, token: res.token };
+            return { user, token: accessToken };
         } catch {
             return null;
         }
