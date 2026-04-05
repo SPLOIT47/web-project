@@ -15,8 +15,7 @@ import {
 
 type AuthApiResponse = {
     user: ApiUserPayload;
-    token?: string;
-    accessToken?: string;
+    accessToken: string;
 };
 
 type MeAuthResponse = {
@@ -35,13 +34,9 @@ export class HttpAuthService implements AuthService {
                     password: data.password,
                 }),
             });
-            const accessToken = res.token ?? res.accessToken;
-            if (!accessToken) {
-                return null;
-            }
-            setStoredToken(accessToken);
+            setStoredToken(res.accessToken);
             const user = await this.loadUserWithProfile(res.user);
-            return { user, token: accessToken };
+            return { user, accessToken: res.accessToken };
         } catch {
             return null;
         }
@@ -62,13 +57,9 @@ export class HttpAuthService implements AuthService {
                     surname: data.surname,
                 }),
             });
-            const accessToken = res.token ?? res.accessToken;
-            if (!accessToken) {
-                return null;
-            }
-            setStoredToken(accessToken);
+            setStoredToken(res.accessToken);
             const user = await this.loadUserWithProfile(res.user);
-            return { user, token: accessToken };
+            return { user, accessToken: res.accessToken };
         } catch {
             return null;
         }
@@ -85,8 +76,8 @@ export class HttpAuthService implements AuthService {
     }
 
     async getCurrentSession(): Promise<LoginResponse | null> {
-        const token = getStoredToken();
-        if (!token) {
+        const accessToken = getStoredToken();
+        if (!accessToken) {
             return null;
         }
         try {
@@ -100,7 +91,7 @@ export class HttpAuthService implements AuthService {
             if (prof.status === "READY" && prof.profile) {
                 user = mergeProfile(user, prof.profile);
             }
-            return { user, token };
+            return { user, accessToken };
         } catch {
             setStoredToken(null);
             return null;

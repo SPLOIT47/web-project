@@ -30,7 +30,7 @@ export class MockAuthService implements AuthService {
 
         session = {
             user,
-            token: "mock-token-" + user.id,
+            accessToken: "mock-token-" + user.id,
         };
 
         return mockResponse(session);
@@ -78,7 +78,7 @@ export class MockAuthService implements AuthService {
 
         session = {
             user: newUser,
-            token: "mock-token-" + newUser.id,
+            accessToken: "mock-token-" + newUser.id,
         };
 
         return mockResponse(session);

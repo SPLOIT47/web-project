@@ -9,7 +9,7 @@ import { useUserStore } from "@/store/userStore";
 
 interface AuthState {
     user: User | null;
-    token: string | null;
+    accessToken: string | null;
     loading: boolean;
     error: string | null;
 
@@ -24,7 +24,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
-    token: null,
+    accessToken: null,
     loading: false,
     error: null,
 
@@ -43,7 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         set({
             user: response.user,
-            token: response.token,
+            accessToken: response.accessToken,
             loading: false,
             error: null,
         });
@@ -69,7 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         set({
             user: response.user,
-            token: response.token,
+            accessToken: response.accessToken,
             loading: false,
             error: null,
         });
@@ -85,7 +85,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } finally {
             set({
                 user: null,
-                token: null,
+                accessToken: null,
                 error: null,
             });
             usePostStore.getState().clear();
@@ -100,7 +100,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         if (session) {
             set({
                 user: session.user,
-                token: session.token,
+                accessToken: session.accessToken,
                 loading: false,
                 error: null,
             });
@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } else {
             set({
                 user: null,
-                token: null,
+                accessToken: null,
                 loading: false,
                 error: null,
             });
@@ -124,7 +124,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
         set({
             user: null,
-            token: null,
+            accessToken: null,
             error: null,
         });
     },
