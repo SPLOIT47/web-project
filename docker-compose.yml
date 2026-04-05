@@ -12,3 +12,10 @@ services:
     ports:
       - "${WEB_PORT:-5173}:80"
     restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
+    name: web
