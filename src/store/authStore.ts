@@ -49,7 +49,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         });
 
         useUserStore.getState().upsertMany([response.user]);
-        await usePostStore.getState().loadFeed();
+        void usePostStore.getState().loadFeed();
 
         return true;
     },
@@ -105,7 +105,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
                 error: null,
             });
             useUserStore.getState().upsertMany([session.user]);
-            await usePostStore.getState().loadFeed();
+            void usePostStore.getState().loadFeed();
         } else {
             set({
                 user: null,
