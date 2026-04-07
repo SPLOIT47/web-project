@@ -4,11 +4,12 @@ import CommunitiesTabs from "@components/community/CommunitiesTabs";
 import CommunitiesList from "@components/community/CommunitiesList";
 import Icon from "@/components/ui/Icon";
 import Button from "@components/ui/Button";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import type { CommunityTab } from "@/domain/community/CommunityTab";
 
 export default function CommunitiesPage() {
     const { t } = useTranslation();
-    const [tab, setTab] = useState<"all" | "my" | "manage" | "search">("all");
+    const [tab, setTab] = useState<CommunityTab>("all");
     const navigate = useNavigate();
 
     return (

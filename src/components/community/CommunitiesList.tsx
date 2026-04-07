@@ -9,7 +9,7 @@ import {mapCommunityToPreview} from "@/presentation/community/mapCommunityToPrev
 export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
     const { t } = useTranslation();
     const authUser = useAuthStore(s => s.user);
-    const { all, my, manage, loading, load } = useCommunitiesStore();
+    const { all, my, loading, load } = useCommunitiesStore();
 
     useEffect(() => {
         if (authUser) {
@@ -38,10 +38,7 @@ export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
         );
     }
 
-    const list =
-        tab === "all" ? all :
-            tab === "my" ? my :
-                manage;
+    const list = tab === "all" ? all : my;
 
     if (list.length === 0) {
         return (

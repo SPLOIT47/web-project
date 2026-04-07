@@ -1,17 +1,17 @@
 import { useTranslation } from "react-i18next";
+import type { CommunityTab } from "@/domain/community/CommunityTab";
 
 export default function CommunitiesTabs({
-                                            active,
-                                            onChange,
-                                        }: {
-    active: string;
-    onChange: (t: any) => void;
+    active,
+    onChange,
+}: {
+    active: CommunityTab;
+    onChange: (t: CommunityTab) => void;
 }) {
     const { t } = useTranslation();
     const tabs = [
         { id: "all", label: t("communities.tabs.all") },
         { id: "my", label: t("communities.tabs.my") },
-        { id: "manage", label: t("communities.tabs.manage") },
         { id: "search", label: t("communities.tabs.search") },
     ];
 

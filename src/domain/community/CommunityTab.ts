@@ -1,1 +1,1 @@
-export type CommunityTab = "all" | "my" | "manage" | "search";
+export type CommunityTab = "all" | "my" | "search";
