@@ -130,7 +130,8 @@
     "createCommunity": "Create Community",
     "tabs": {
       "all": "All",
-      "my": "My Communities",
+      "my": "My subscriptions",
+      "manage": "Management",
       "search": "Search"
     },
     "members": "members",

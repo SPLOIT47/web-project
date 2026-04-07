@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import CommunitiesTabs from "@components/community/CommunitiesTabs";
 import CommunitiesList from "@components/community/CommunitiesList";
@@ -11,6 +11,7 @@ export default function CommunitiesPage() {
     const { t } = useTranslation();
     const [tab, setTab] = useState<CommunityTab>("all");
     const navigate = useNavigate();
+    const listScrollRef = useRef<HTMLDivElement>(null);
 
     return (
         <div className="
@@ -42,12 +43,15 @@ export default function CommunitiesPage() {
 
             <CommunitiesTabs active={tab} onChange={setTab} />
 
-            <div className="
+            <div
+                ref={listScrollRef}
+                className="
                 h-[calc(100%-140px)] mobile:h-[calc(100%-150px)] tablet:h-[calc(100%-160px)] 
                 overflow-y-auto 
                 mt-3 tablet:mt-4
-            ">
-                <CommunitiesList tab={tab} />
+            "
+            >
+                <CommunitiesList tab={tab} scrollRootRef={listScrollRef} />
             </div>
 
         </div>

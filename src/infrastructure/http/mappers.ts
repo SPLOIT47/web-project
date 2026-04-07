@@ -236,6 +236,7 @@ export function mapCommunityRow(
 
     return {
         id: row.communityId,
+        ownerUserId: row.ownerUserId,
         name: row.name,
         type,
         category: row.category,

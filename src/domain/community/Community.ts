@@ -14,6 +14,7 @@ export interface Community
         AdminManageable,
         Postable
 {
+    ownerUserId: string;
     coverUrl: string;
     category: string;
     type: CommunityTypeId;

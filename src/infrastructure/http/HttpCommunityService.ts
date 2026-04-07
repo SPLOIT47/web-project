@@ -12,6 +12,21 @@ import {
 } from "./mappers";
 
 export class HttpCommunityService implements CommunityService {
+    private async mapRowsToCommunities(rows: CommunityRow[]): Promise<Community[]> {
+        const out: Community[] = [];
+        for (const row of rows) {
+            try {
+                const members = await httpRequest<MemberRow[]>(
+                    `/api/communities/${encodeURIComponent(row.communityId)}/members`,
+                );
+                out.push(mapCommunityRow(row, members));
+            } catch {
+                out.push(mapCommunityRow(row, []));
+            }
+        }
+        return out;
+    }
+
     async getById(id: string): Promise<Community | null> {
         try {
             const row = await httpRequest<CommunityRow>(
@@ -26,38 +41,20 @@ export class HttpCommunityService implements CommunityService {
         }
     }
 
-    async getAll(): Promise<Community[]> {
+    async searchCommunities(offset: number, limit: number): Promise<Community[]> {
         const rows = await httpRequest<CommunityRow[]>(
-            "/api/communities/search",
+            `/api/communities/search?limit=${limit}&offset=${offset}`,
         );
-        const out: Community[] = [];
-        for (const row of rows) {
-            try {
-                const members = await httpRequest<MemberRow[]>(
-                    `/api/communities/${encodeURIComponent(row.communityId)}/members`,
-                );
-                out.push(mapCommunityRow(row, members));
-            } catch {
-                out.push(mapCommunityRow(row, []));
-            }
-        }
-        return out;
+        return this.mapRowsToCommunities(rows);
+    }
+
+    async getAll(): Promise<Community[]> {
+        return this.searchCommunities(0, 500);
     }
 
     async getMine(_userId: string): Promise<Community[]> {
         const rows = await httpRequest<CommunityRow[]>("/api/communities/me");
-        const out: Community[] = [];
-        for (const row of rows) {
-            try {
-                const members = await httpRequest<MemberRow[]>(
-                    `/api/communities/${encodeURIComponent(row.communityId)}/members`,
-                );
-                out.push(mapCommunityRow(row, members));
-            } catch {
-                out.push(mapCommunityRow(row, []));
-            }
-        }
-        return out;
+        return this.mapRowsToCommunities(rows);
     }
 
     async getPosts(communityId: string): Promise<Post[]> {

@@ -5,7 +5,7 @@ import type { CreateCommunityPayload } from "@/domain/community/CreateCommunityP
 export interface CommunityService {
     getById(id: string): Promise<Community | null>;
     getAll(): Promise<Community[]>;
-    /** Communities the user is a member of (backend: GET /communities/me). */
+    searchCommunities(offset: number, limit: number): Promise<Community[]>;
     getMine(userId: string): Promise<Community[]>;
 
     getPosts(id: string): Promise<Post[]>;

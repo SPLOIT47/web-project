@@ -1,24 +1,60 @@
-import { useEffect } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/store";
 import { useCommunitiesStore } from "@/store/communitiesStore";
 import type { CommunityTab } from "@/domain/community/CommunityTab";
 import CommunityCard from "./CommunityCard";
-import {mapCommunityToPreview} from "@/presentation/community/mapCommunityToPreview";
+import { mapCommunityToPreview } from "@/presentation/community/mapCommunityToPreview";
 
-export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
+export default function CommunitiesList({
+    tab,
+    scrollRootRef,
+}: {
+    tab: CommunityTab;
+    scrollRootRef?: RefObject<HTMLDivElement | null>;
+}) {
     const { t } = useTranslation();
     const authUser = useAuthStore(s => s.user);
-    const { all, my, loading, load } = useCommunitiesStore();
+    const {
+        all,
+        my,
+        manage,
+        loading,
+        loadingMore,
+        load,
+        loadMoreCatalog,
+    } = useCommunitiesStore();
+
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (authUser) {
-            load(authUser.id, tab);
+            void load(authUser.id, tab);
         }
     }, [tab, authUser, load]);
 
+    useEffect(() => {
+        if (tab !== "all") return;
+        const root = scrollRootRef?.current ?? null;
+        const target = sentinelRef.current;
+        if (!target) return;
+
+        const io = new IntersectionObserver(
+            entries => {
+                if (entries[0]?.isIntersecting) {
+                    void loadMoreCatalog();
+                }
+            },
+            { root, rootMargin: "160px", threshold: 0 },
+        );
+        io.observe(target);
+        return () => io.disconnect();
+    }, [tab, scrollRootRef, loadMoreCatalog, all.length]);
+
     if (loading) {
-        return <div className="opacity-60 text-center">{t("common.loading")}</div>;
+        return (
+            <div className="opacity-60 text-center">{t("common.loading")}</div>
+        );
     }
 
     if (tab === "search") {
@@ -38,7 +74,12 @@ export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
         );
     }
 
-    const list = tab === "all" ? all : my;
+    const list =
+        tab === "all"
+            ? all
+            : tab === "my"
+              ? my
+              : manage;
 
     if (list.length === 0) {
         return (
@@ -49,7 +90,9 @@ export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
     }
 
     return (
-        <div className="
+        <div className="fade-in">
+            <div
+                className="
         grid
         grid-cols-1
         tablet:grid-cols-2
@@ -57,14 +100,26 @@ export default function CommunitiesList({ tab }: { tab: CommunityTab }) {
         desktop:grid-cols-3
         gap-3 tablet:gap-4
         pr-1 tablet:pr-2
-        fade-in
-    ">
-            {list.map(c => (
-                <CommunityCard
-                    key={c.id}
-                    community={mapCommunityToPreview(c)}
-                />
-            ))}
+    "
+            >
+                {list.map(c => (
+                    <CommunityCard
+                        key={c.id}
+                        community={mapCommunityToPreview(c)}
+                    />
+                ))}
+            </div>
+
+            {tab === "all" && (
+                <>
+                    <div ref={sentinelRef} className="h-1 w-full" aria-hidden />
+                    {loadingMore && (
+                        <div className="opacity-60 text-center py-4 text-sm">
+                            {t("common.loading")}
+                        </div>
+                    )}
+                </>
+            )}
         </div>
     );
 }

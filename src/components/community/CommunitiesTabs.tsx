@@ -9,9 +9,10 @@ export default function CommunitiesTabs({
     onChange: (t: CommunityTab) => void;
 }) {
     const { t } = useTranslation();
-    const tabs = [
+    const tabs: { id: CommunityTab; label: string }[] = [
         { id: "all", label: t("communities.tabs.all") },
         { id: "my", label: t("communities.tabs.my") },
+        { id: "manage", label: t("communities.tabs.manage") },
         { id: "search", label: t("communities.tabs.search") },
     ];
 
@@ -23,10 +24,11 @@ export default function CommunitiesTabs({
             -mx-3 mobile:-mx-4 tablet:-mx-6 px-3 mobile:px-4 tablet:px-6
             scrollbar-hide
         ">
-            {tabs.map((t) => (
+            {tabs.map(tab => (
                 <button
-                    key={t.id}
-                    onClick={() => onChange(t.id)}
+                    key={tab.id}
+                    type="button"
+                    onClick={() => onChange(tab.id)}
                     className={`
                         px-3 mobile:px-4 py-1.5 mobile:py-2 
                         rounded-lg border 
@@ -34,13 +36,13 @@ export default function CommunitiesTabs({
                         whitespace-nowrap
                         transition-all 
                         shrink-0
-                        ${active === t.id
+                        ${active === tab.id
                         ? "neon-surface neon-surface-hover"
                         : "border-[var(--border-color)] bg-[var(--bg-surface)] hover:border-[var(--primary)]"
                     }
                     `}
                 >
-                    {t.label}
+                    {tab.label}
                 </button>
             ))}
         </div>

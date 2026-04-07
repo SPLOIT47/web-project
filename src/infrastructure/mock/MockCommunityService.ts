@@ -17,9 +17,15 @@ export class MockCommunityService implements CommunityService {
         );
     }
 
-    async getAll(): Promise<Community[]> {
+    async searchCommunities(offset: number, limit: number): Promise<Community[]> {
         const db = loadDb();
-        return mockResponse(db.communities);
+        return mockResponse(
+            db.communities.slice(offset, offset + limit),
+        );
+    }
+
+    async getAll(): Promise<Community[]> {
+        return this.searchCommunities(0, 500);
     }
 
     async getMine(userId: string): Promise<Community[]> {
@@ -53,6 +59,7 @@ export class MockCommunityService implements CommunityService {
 
         const community: Community = {
             id: faker.string.uuid(),
+            ownerUserId: creatorId,
 
             name: data.name,
             type: data.type,
