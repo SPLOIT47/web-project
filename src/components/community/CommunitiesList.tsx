@@ -95,11 +95,9 @@ export default function CommunitiesList({
                 className="
         grid
         grid-cols-1
-        tablet:grid-cols-2
-        laptop:grid-cols-2
-        desktop:grid-cols-3
         gap-3 tablet:gap-4
         pr-1 tablet:pr-2
+        tablet:grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]
     "
             >
                 {list.map(c => (
