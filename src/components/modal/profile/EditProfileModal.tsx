@@ -28,6 +28,7 @@ export default function EditProfileModal({
     const clearError = useProfileStore(s => s.clearError);
 
     const fileRef = useRef<HTMLInputElement>(null);
+    const [languageDraft, setLanguageDraft] = useState("");
 
     const [form, setForm] = useState<EditProfilePayload>(() => ({
         name: user.name ?? "",
@@ -53,6 +54,7 @@ export default function EditProfileModal({
             languages: user.languages ?? [],
             avatarUrl: user.avatarUrl ?? "",
         });
+        setLanguageDraft("");
     }, [open, user, clearError]);
 
     const updateField = <K extends keyof EditProfilePayload>(
@@ -60,6 +62,21 @@ export default function EditProfileModal({
         value: EditProfilePayload[K]
     ) => {
         setForm(prev => ({ ...prev, [key]: value }));
+    };
+
+    const addLanguage = () => {
+        const v = languageDraft.trim();
+        if (!v) return;
+        const current = form.languages ?? [];
+        if (current.some(s => s.toLowerCase() === v.toLowerCase())) return;
+        updateField("languages", [...current, v]);
+        setLanguageDraft("");
+    };
+
+    const removeLanguage = (index: number) => {
+        const current = [...(form.languages ?? [])];
+        current.splice(index, 1);
+        updateField("languages", current);
     };
 
     const handleAvatarSelected = async (
@@ -155,11 +172,62 @@ export default function EditProfileModal({
                 />
 
                 <input
-                    className="w-full mb-4 p-2 border rounded bg-[var(--bg-surface)]"
+                    className="w-full mb-3 p-2 border rounded bg-[var(--bg-surface)]"
                     placeholder={t("modal.editProfile.education")}
                     value={form.education}
                     onChange={e => updateField("education", e.target.value)}
                 />
+
+                <div className="mb-4">
+                    <div className="text-sm opacity-80 mb-2">
+                        {t("modal.editProfile.languages")}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2 min-h-[2rem]">
+                        {(form.languages ?? []).map((lang, i) => (
+                            <span
+                                key={`${lang}-${i}`}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-[var(--border-color)] bg-[var(--bg-surface)] text-sm"
+                            >
+                                {lang}
+                                <button
+                                    type="button"
+                                    className="opacity-70 hover:opacity-100 p-0.5 leading-none"
+                                    onClick={() => removeLanguage(i)}
+                                    disabled={loading}
+                                    aria-label={t("modal.editProfile.remove")}
+                                >
+                                    ×
+                                </button>
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex gap-2">
+                        <input
+                            className="flex-1 min-w-0 p-2 border rounded bg-[var(--bg-surface)]"
+                            placeholder={t(
+                                "modal.editProfile.languagePlaceholder",
+                            )}
+                            value={languageDraft}
+                            onChange={e => setLanguageDraft(e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    addLanguage();
+                                }
+                            }}
+                            disabled={loading}
+                        />
+                        <Button
+                            type="button"
+                            className="shrink-0 px-3"
+                            onClick={addLanguage}
+                            disabled={loading}
+                            aria-label={t("modal.editProfile.addLanguage")}
+                        >
+                            <Icon name="plus" />
+                        </Button>
+                    </div>
+                </div>
 
                 {saveError && (
                     <p className="text-red-400 text-sm mb-3">{saveError}</p>
