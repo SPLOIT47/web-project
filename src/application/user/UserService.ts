@@ -18,6 +18,7 @@ export interface UserService {
     ): Promise<User>;
 
     getFriends(userId: string): Promise<User[]>;
+    getFriendCountForUser(userId: string): Promise<number>;
     getIncomingRequests(userId: string): Promise<User[]>;
     getOutgoingRequests(userId: string): Promise<User[]>;
 

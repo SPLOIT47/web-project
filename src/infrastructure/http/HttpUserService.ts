@@ -133,8 +133,15 @@ export class HttpUserService implements UserService {
 
     async getFriends(userId: string): Promise<User[]> {
         const { friends } = await httpRequest<FriendIdsResponse>("/api/friends/me");
-        const others = friends.filter(id => id !== userId);
+        const others = (friends ?? []).filter(id => id !== userId);
         return this.getBatch(others);
+    }
+
+    async getFriendCountForUser(userId: string): Promise<number> {
+        const res = await httpRequest<{ count: number }>(
+            `/api/friends/count/${encodeURIComponent(userId)}`,
+        );
+        return typeof res.count === "number" ? res.count : 0;
     }
 
     async getIncomingRequests(userId: string): Promise<User[]> {

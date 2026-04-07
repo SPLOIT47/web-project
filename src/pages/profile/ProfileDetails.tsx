@@ -3,8 +3,17 @@ import Icon from "@components/ui/Icon";
 import Card from "@components/ui/Card";
 import type { User } from "@/domain/user/User";
 
-export default function ProfileDetails({ user }: { user: User }) {
+export default function ProfileDetails({
+    user,
+    friendsCountValue,
+}: {
+    user: User;
+    friendsCountValue: number | null;
+}) {
     const { t } = useTranslation();
+
+    const friendsLabel =
+        friendsCountValue === null ? "…" : String(friendsCountValue);
 
     return (
         <Card className="mt-4 p-4 fade-in">
@@ -24,7 +33,7 @@ export default function ProfileDetails({ user }: { user: User }) {
                     <Item icon="university" label={t("profile.education")} value={user.education} />
                 )}
 
-                <Item icon="user-friends" label={t("profile.friends")} value={String(user.friends.length ?? 0)} />
+                <Item icon="user-friends" label={t("profile.friends")} value={friendsLabel} />
 
                 {user.languages && (
                     <Item icon="globe" label={t("profile.languages")} value={user.languages.join(", ")} />

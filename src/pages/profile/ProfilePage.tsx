@@ -115,10 +115,14 @@ export default function ProfilePage() {
     const [friendsCount, setFriendsCount] = useState<number | null>(null);
 
     const refreshFriendsCount = useCallback(async () => {
-        if (!authUser?.id) return;
-        const list = await ServiceLocator.userService.getFriends(authUser.id);
-        setFriendsCount(list.length);
-    }, [authUser?.id]);
+        if (!user?.id) return;
+        try {
+            const n = await ServiceLocator.userService.getFriendCountForUser(
+                user.id,
+            );
+            setFriendsCount(n);
+        } catch {}
+    }, [user?.id]);
 
     const refreshRelation = useCallback(async () => {
         if (!authUser?.id || !user?.id || isMe) return;
@@ -132,9 +136,26 @@ export default function ProfilePage() {
     useEffect(() => {
         if (!authUser?.id || !user?.id) return;
 
+        let cancelled = false;
+        setFriendsCount(null);
+        void ServiceLocator.userService
+            .getFriendCountForUser(user.id)
+            .then(n => {
+                if (!cancelled) setFriendsCount(n);
+            })
+            .catch(() => {
+                if (!cancelled) setFriendsCount(null);
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, [authUser?.id, user?.id]);
+
+    useEffect(() => {
+        if (!authUser?.id || !user?.id) return;
+
         if (isMe) {
             setProfileRelation(null);
-            void refreshFriendsCount();
             return;
         }
 
@@ -150,7 +171,7 @@ export default function ProfilePage() {
         return () => {
             cancelled = true;
         };
-    }, [authUser?.id, user?.id, isMe, refreshFriendsCount]);
+    }, [authUser?.id, user?.id, isMe]);
 
     if (profileLoading) {
         return (
@@ -237,11 +258,9 @@ export default function ProfilePage() {
                             </div>
                             <div>
                                 <b>
-                                    {isMe
-                                        ? friendsCount === null
-                                            ? "…"
-                                            : friendsCount
-                                        : "—"}
+                                    {friendsCount === null
+                                        ? "…"
+                                        : String(friendsCount)}
                                 </b>{" "}
                                 {t("profile.friends")}
                             </div>
@@ -249,7 +268,9 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                {showDetails && <ProfileDetails user={user} />}
+                {showDetails && (
+                    <ProfileDetails user={user} friendsCountValue={friendsCount} />
+                )}
 
                 <div className="mt-6 flex gap-4 flex-wrap">
 

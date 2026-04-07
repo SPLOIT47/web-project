@@ -110,6 +110,12 @@ export class MockUserService implements UserService {
         );
     }
 
+    async getFriendCountForUser(userId: string): Promise<number> {
+        const db = loadDb();
+        const user = db.users.find(u => u.id === userId);
+        return mockResponse(user?.friends.length ?? 0);
+    }
+
     async getIncomingRequests(userId: string): Promise<User[]> {
         const db = loadDb();
         const user = db.users.find(u => u.id === userId);
