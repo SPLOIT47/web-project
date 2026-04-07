@@ -110,12 +110,6 @@ export class MockUserService implements UserService {
         );
     }
 
-    async getFriendCountForUser(userId: string): Promise<number> {
-        const db = loadDb();
-        const user = db.users.find(u => u.id === userId);
-        return mockResponse(user?.friends.length ?? 0);
-    }
-
     async getIncomingRequests(userId: string): Promise<User[]> {
         const db = loadDb();
         const user = db.users.find(u => u.id === userId);
@@ -240,23 +234,26 @@ export class MockUserService implements UserService {
     async getFriendRelation(
         viewerId: string,
         targetUserId: string,
-    ): Promise<FriendRelation> {
-        if (viewerId === targetUserId) {
-            return mockResponse("none");
-        }
+    ): Promise<{ relation: FriendRelation; friendCount: number }> {
         const db = loadDb();
+        const target = db.users.find(u => u.id === targetUserId);
+        const friendCount = target?.friends.length ?? 0;
+
+        if (viewerId === targetUserId) {
+            return mockResponse({ relation: "none", friendCount });
+        }
         const viewer = db.users.find(u => u.id === viewerId);
-        if (!viewer) return mockResponse("none");
+        if (!viewer) return mockResponse({ relation: "none", friendCount });
 
         if (viewer.friends.includes(targetUserId)) {
-            return mockResponse("friends");
+            return mockResponse({ relation: "friends", friendCount });
         }
         if (viewer.incomingRequests.includes(targetUserId)) {
-            return mockResponse("incoming");
+            return mockResponse({ relation: "incoming", friendCount });
         }
         if (viewer.outgoingRequests.includes(targetUserId)) {
-            return mockResponse("outgoing");
+            return mockResponse({ relation: "outgoing", friendCount });
         }
-        return mockResponse("none");
+        return mockResponse({ relation: "none", friendCount });
     }
 }

@@ -114,59 +114,48 @@ export default function ProfilePage() {
         useState<FriendRelation | null>(null);
     const [friendsCount, setFriendsCount] = useState<number | null>(null);
 
-    const refreshFriendsCount = useCallback(async () => {
-        if (!user?.id) return;
+    const refreshFriendRelation = useCallback(async () => {
+        if (!authUser?.id || !user?.id) return;
         try {
-            const n = await ServiceLocator.userService.getFriendCountForUser(
-                user.id,
-            );
-            setFriendsCount(n);
+            const { relation: r, friendCount } =
+                await ServiceLocator.userService.getFriendRelation(
+                    authUser.id,
+                    user.id,
+                );
+            setFriendsCount(friendCount);
+            if (authUser.id === user.id) {
+                setProfileRelation(null);
+            } else {
+                setProfileRelation(r);
+            }
         } catch {}
-    }, [user?.id]);
-
-    const refreshRelation = useCallback(async () => {
-        if (!authUser?.id || !user?.id || isMe) return;
-        const r = await ServiceLocator.userService.getFriendRelation(
-            authUser.id,
-            user.id,
-        );
-        setProfileRelation(r);
-    }, [authUser?.id, user?.id, isMe]);
+    }, [authUser?.id, user?.id]);
 
     useEffect(() => {
         if (!authUser?.id || !user?.id) return;
 
         let cancelled = false;
         setFriendsCount(null);
-        void ServiceLocator.userService
-            .getFriendCountForUser(user.id)
-            .then(n => {
-                if (!cancelled) setFriendsCount(n);
-            })
-            .catch(() => {
-                if (!cancelled) setFriendsCount(null);
-            });
-        return () => {
-            cancelled = true;
-        };
-    }, [authUser?.id, user?.id]);
-
-    useEffect(() => {
-        if (!authUser?.id || !user?.id) return;
-
         if (isMe) {
             setProfileRelation(null);
-            return;
         }
 
-        let cancelled = false;
-        ServiceLocator.userService
+        void ServiceLocator.userService
             .getFriendRelation(authUser.id, user.id)
-            .then(r => {
-                if (!cancelled) setProfileRelation(r);
+            .then(({ relation: r, friendCount }) => {
+                if (cancelled) return;
+                setFriendsCount(friendCount);
+                if (isMe) {
+                    setProfileRelation(null);
+                } else {
+                    setProfileRelation(r);
+                }
             })
             .catch(() => {
-                if (!cancelled) setProfileRelation(null);
+                if (!cancelled) {
+                    setFriendsCount(null);
+                    if (!isMe) setProfileRelation(null);
+                }
             });
         return () => {
             cancelled = true;
@@ -304,7 +293,7 @@ export default function ProfilePage() {
                                     className="bg-red-600"
                                     onClick={async () => {
                                         await remove(authUser.id, user.id);
-                                        await refreshRelation();
+                                        await refreshFriendRelation();
                                     }}
                                 >
                                     {t("friends.removeFriend")}
@@ -319,8 +308,7 @@ export default function ProfilePage() {
                                                 authUser.id,
                                                 user.id,
                                             );
-                                            await refreshRelation();
-                                            await refreshFriendsCount();
+                                            await refreshFriendRelation();
                                         }}
                                     >
                                         {t("friends.acceptRequest")}
@@ -331,7 +319,7 @@ export default function ProfilePage() {
                                                 authUser.id,
                                                 user.id,
                                             );
-                                            await refreshRelation();
+                                            await refreshFriendRelation();
                                         }}
                                     >
                                         {t("friends.decline")}
@@ -346,7 +334,7 @@ export default function ProfilePage() {
                                             authUser.id,
                                             user.id,
                                         );
-                                        await refreshRelation();
+                                        await refreshFriendRelation();
                                     }}
                                 >
                                     {t("friends.cancelRequest")}
@@ -360,7 +348,7 @@ export default function ProfilePage() {
                                             authUser.id,
                                             user.id,
                                         );
-                                        await refreshRelation();
+                                        await refreshFriendRelation();
                                     }}
                                 >
                                     {t("friends.addFriend")}

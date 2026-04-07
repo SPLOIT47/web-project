@@ -137,13 +137,6 @@ export class HttpUserService implements UserService {
         return this.getBatch(others);
     }
 
-    async getFriendCountForUser(userId: string): Promise<number> {
-        const res = await httpRequest<{ count: number }>(
-            `/api/friends/count/${encodeURIComponent(userId)}`,
-        );
-        return typeof res.count === "number" ? res.count : 0;
-    }
-
     async getIncomingRequests(userId: string): Promise<User[]> {
         const rows = await httpRequest<FriendRequestRow[]>(
             "/api/friends/requests/incoming",
@@ -200,23 +193,28 @@ export class HttpUserService implements UserService {
     async getFriendRelation(
         _viewerId: string,
         targetUserId: string,
-    ): Promise<FriendRelation> {
+    ): Promise<{ relation: FriendRelation; friendCount: number }> {
         type Api = {
             relation: "self" | "friends" | "incoming" | "outgoing" | "none";
+            friendCount?: number;
         };
         const res = await httpRequest<Api>(
             `/api/friends/relation/${encodeURIComponent(targetUserId)}`,
         );
+        const friendCount =
+            typeof res.friendCount === "number" ? res.friendCount : 0;
         const r = res.relation;
-        if (r === "self") return "none";
+        if (r === "self") {
+            return { relation: "none", friendCount };
+        }
         if (
             r === "friends" ||
             r === "incoming" ||
             r === "outgoing" ||
             r === "none"
         ) {
-            return r;
+            return { relation: r, friendCount };
         }
-        return "none";
+        return { relation: "none", friendCount };
     }
 }
